@@ -43,7 +43,7 @@ public class UserController {
     @PutMapping
     public User put(@RequestBody User user) {
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException400("Дата рождения не может быть в будущем");
+            throw new ValidationException500("Дата рождения не может быть в будущем");
         }
         if (!users.containsKey(user.getId())) {
             throw new ValidationException500("No such user id: " + user.getId());

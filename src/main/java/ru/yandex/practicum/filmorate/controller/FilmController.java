@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
+import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ public class FilmController {
     @PutMapping
     public Film put(@RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new ValidationException400("No such film id: " + film.getId());
+            throw new ValidationException500("No such film id: " + film.getId());
         }
         films.put(film.getId(), film);
         return film;
