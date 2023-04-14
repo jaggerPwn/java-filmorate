@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -30,7 +31,11 @@ public class UserController {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
 
-        if (user.getName() == null || user.getName().equals("")) user.setName(user.getLogin());
+        if (user.getName() == null) {
+            user.setName(user.getLogin());
+        } else if (user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
         user.setId(++id);
         users.put(user.getId(), user);
         return user;

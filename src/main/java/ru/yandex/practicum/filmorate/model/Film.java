@@ -11,13 +11,13 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    int id;
+    private int id;
     @NotNull(message = "Name should not be null")
     @NotEmpty(message = "Name should not be empty")
-    String name;
+    private String name;
     @Size(message = "Too many symbols in description, max=200", max = 200)
-    String description;
-    LocalDate releaseDate;
+    private String description;
+    private LocalDate releaseDate;
     @Min(0)
-    int duration;
+    private int duration;
 }

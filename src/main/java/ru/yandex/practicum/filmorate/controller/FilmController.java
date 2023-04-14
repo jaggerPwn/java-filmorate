@@ -27,7 +27,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateTimeFormatter.ISO_LOCAL_DATE))) {
+        if (filmDateIsBefore(film)) {
             throw new ValidationException("дата релиза должна быть не раньше 28 декабря 1895 года");
         }
         film.setId(++id);
@@ -42,5 +42,9 @@ public class FilmController {
         }
         films.put(film.getId(), film);
         return film;
+    }
+
+    private static boolean filmDateIsBefore(Film film) {
+        return film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateTimeFormatter.ISO_LOCAL_DATE));
     }
 }
