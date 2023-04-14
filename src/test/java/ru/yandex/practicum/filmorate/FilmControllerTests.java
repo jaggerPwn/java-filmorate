@@ -106,7 +106,7 @@ public class FilmControllerTests {
                 "  \"duration\": 200\n" +
                 "}";
 
-        testToExpect4xxError(jsonStr);
+        testPostToExpect4xxError(jsonStr);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class FilmControllerTests {
                 "  \"duration\": 200\n" +
                 "}";
 
-        testToExpect4xxError(jsonStr);
+        testPostToExpect4xxError(jsonStr);
     }
 
     @Test
@@ -130,9 +130,21 @@ public class FilmControllerTests {
                 "  \"duration\": 200\n" +
                 "}";
 
-        testToExpect4xxError(jsonStr);
+        testPostToExpect4xxError(jsonStr);
     }
+    @Test
+    public void filmUpdateUnknown() throws Exception {
+        String jsonStr = "{\n" +
+                "  \"name\": \"Name\",\n" +
+                "  \"description\": \"Description\",\n" +
+                "  \"releaseDate\": \"1890-03-25\",\n" +
+                "  \"duration\": 200\n" +
+                "}";
 
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+                        .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+    }
     @Test
     public void filmNotRegisteredZeroORNegativeDuration() throws Exception {
         String jsonStr = "{\n" +
@@ -142,17 +154,17 @@ public class FilmControllerTests {
                 "  \"duration\": -200\n" +
                 "}";
 
-        testToExpect4xxError(jsonStr);
+        testPostToExpect4xxError(jsonStr);
         jsonStr = "{\n" +
                 "  \"name\": \"Name\",\n" +
                 "  \"description\": \"Descrition\",\n" +
                 "  \"releaseDate\": \"1980-03-25\",\n" +
                 "  \"duration\": 0\n" +
                 "}";
-        testToExpect4xxError(jsonStr);
+        testPostToExpect4xxError(jsonStr);
     }
 
-    private void testToExpect4xxError(String jsonStr) throws Exception {
+    private void testPostToExpect4xxError(String jsonStr) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());

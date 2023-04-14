@@ -137,4 +137,5 @@ public class UserControllerTests {
         String login = object.get("name").getAsString();
         Assert.assertEquals(login, "common");
     }
+
 }
