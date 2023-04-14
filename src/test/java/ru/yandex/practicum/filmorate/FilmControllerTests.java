@@ -132,6 +132,7 @@ public class FilmControllerTests {
 
         testPostToExpect4xxError(jsonStr);
     }
+
     @Test
     public void filmUpdateUnknown() throws Exception {
         String jsonStr = "{\n" +
@@ -145,6 +146,7 @@ public class FilmControllerTests {
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
     }
+
     @Test
     public void filmNotRegisteredZeroORNegativeDuration() throws Exception {
         String jsonStr = "{\n" +
