@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ public class FilmController {
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         if (filmDateIsBefore(film)) {
-            throw new ValidationException("дата релиза должна быть не раньше 28 декабря 1895 года");
+            throw new ValidationException400("дата релиза должна быть не раньше 28 декабря 1895 года");
         }
         film.setId(++id);
         films.put(film.getId(), film);
@@ -37,7 +37,7 @@ public class FilmController {
     @PutMapping
     public Film put(@RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new ValidationException("No such film id: " + film.getId());
+            throw new ValidationException400("No such film id: " + film.getId());
         }
         films.put(film.getId(), film);
         return film;
