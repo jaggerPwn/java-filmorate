@@ -1,14 +1,12 @@
 package ru.yandex.practicum.filmorate;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +15,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ru.yandex.practicum.filmorate.model.User;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -35,9 +31,6 @@ public class UserControllerTests {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @Test
     public void userSuccessfullyReturns() throws Exception {
         String jsonStr = "{\n" + "  \"login\": \"dolore\",\n"
@@ -45,7 +38,7 @@ public class UserControllerTests {
                 + "  \"birthday\": \"1946-08-20\"\n" + "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
+                        .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
@@ -77,6 +70,7 @@ public class UserControllerTests {
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
+
     @Test
     public void userNotRegisteredEmail() throws Exception {
         String jsonStr = "{\n" +
@@ -110,6 +104,7 @@ public class UserControllerTests {
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
+
     @Test
     public void userNotRegisteredBirthday() throws Exception {
         String jsonStr = "{\n" +
@@ -121,12 +116,25 @@ public class UserControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
-                .andExpect(MockMvcResultMatchers.status().isExpectationFailed());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    public void userRegisteredEmptyName() throws Exception {
+        String jsonStr = "{\n" +
+                "  \"login\": \"common\",\n" +
+                "  \"email\": \"friend@common.ru\",\n" +
+                "  \"birthday\": \"2000-08-20\"\n" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonStr.getBytes())).andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JsonElement jsonElement = JsonParser.parseString(contentAsString);
+        JsonObject object = jsonElement.getAsJsonObject();
+        String login = object.get("name").getAsString();
+        Assert.assertEquals(login, "common");
     }
 }
-
-
-//@AfterEach
-//    void close(){
-//FilmorateApplication.getRun().close();
-//    }

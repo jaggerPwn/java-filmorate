@@ -18,6 +18,6 @@ public class Film {
     @Size(message = "Too many symbols in description, max=200", max = 200)
     private String description;
     private LocalDate releaseDate;
-    @Min(0)
+    @Min(1)
     private int duration;
 }
