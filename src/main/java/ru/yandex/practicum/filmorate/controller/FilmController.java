@@ -3,48 +3,36 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException400;
-import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
-    private int id = 0;
+    private final FilmStorage filmStorage;
+
+    public FilmController(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
     public Collection<Film> findAll() {
-        return films.values();
+        return filmStorage.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (filmDateIsBefore(film)) {
-            throw new ValidationException400("дата релиза должна быть не раньше 28 декабря 1895 года");
-        }
-        film.setId(++id);
-        films.put(film.getId(), film);
-        return film;
+
+        return filmStorage.create(film);
     }
 
     @PutMapping
     public Film put(@RequestBody Film film) {
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException500("No such film id: " + film.getId());
-        }
-        films.put(film.getId(), film);
-        return film;
-    }
-
-    private static boolean filmDateIsBefore(Film film) {
-        return film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateTimeFormatter.ISO_LOCAL_DATE));
+        return filmStorage.put(film);
     }
 }
