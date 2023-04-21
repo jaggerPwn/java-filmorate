@@ -1,21 +1,18 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Primary
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int id = 0;
@@ -55,5 +52,16 @@ public class InMemoryUserStorage implements UserStorage {
         users.put(user.getId(), user);
 
         return user;
+    }
+
+    @Override
+    public Map<Integer, User> getUsers() {
+        return users;
+    }
+
+    @Override
+    public User getUserById(int id) {
+        User user = users.get(id);
+        return users.get(id);
     }
 }

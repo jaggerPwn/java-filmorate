@@ -6,36 +6,31 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
 
-@RunWith(SpringRunner.class)
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+
 @SpringBootTest
+@AutoConfigureMockMvc
+
 public class FilmControllerTests {
-    private MockMvc mockMvc;
     @Autowired
-    private WebApplicationContext wac;
+    private MockMvc mockMvc;
 
-    @Before
-    public void setupMockMvc() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-    }
 
-    @Test
+
+
     public void filmSuccessfullyReturns() throws Exception {
         String jsonStr = "{\n" +
                 "  \"name\": \"nisi eiusmod\",\n" +
@@ -44,14 +39,14 @@ public class FilmControllerTests {
                 "  \"duration\": 100\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/films"))
+        mockMvc.perform(get("/films"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        MvcResult mvcResult = mockMvc.perform(post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonStr.getBytes())).andReturn();
 
@@ -73,12 +68,12 @@ public class FilmControllerTests {
                 "  \"duration\": 190,\n" +
                 "  \"rate\": 4\n" +
                 "}";
-        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+        mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/films")
+        MvcResult mvcResult = mockMvc.perform(get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonStr.getBytes())).andReturn();
 
@@ -142,7 +137,7 @@ public class FilmControllerTests {
                 "  \"duration\": 200\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+        mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
     }
@@ -167,7 +162,7 @@ public class FilmControllerTests {
     }
 
     private void testPostToExpect4xxError(String jsonStr) throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
