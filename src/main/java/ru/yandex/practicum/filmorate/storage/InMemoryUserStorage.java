@@ -67,7 +67,7 @@ public class InMemoryUserStorage implements UserStorage {
             if (value.getId() == id) user = value;
         }
 
-        if(user == null) throw new ValidationException404("No such user id: " + id);
+        if (user == null) throw new ValidationException404("No such user id: " + id);
         return user;
     }
 }
