@@ -35,7 +35,7 @@ public class UserService {
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
-        return Map.of("Success","Now friends " + userId + " : " + friendId);
+        return Map.of("Success", "Now friends " + userId + " : " + friendId);
     }
 
     public Map<String, String> deleteFriend(int userId, int friendId) {
@@ -53,7 +53,7 @@ public class UserService {
         else {
             user.getFriends().remove(friendId);
             friend.getFriends().remove(userId);
-            return Map.of("Success","Not friends anymore " +  userId + " : " + friendId);
+            return Map.of("Success", "Not friends anymore " + userId + " : " + friendId);
         }
 
     }
@@ -65,8 +65,8 @@ public class UserService {
     public Set<User> getUserFriends(int userId) {
         Set<Integer> friends = getUserStorage().getUserById(userId).getFriends();
         Set<User> userFriends = new TreeSet<>((o1, o2) -> {
-            if(o1.getId()>o2.getId()) return 1;
-            else if (o2.getId()>o1.getId()) return -1;
+            if (o1.getId() > o2.getId()) return 1;
+            else if (o2.getId() > o1.getId()) return -1;
             return 0;
         });
         friends.stream()
