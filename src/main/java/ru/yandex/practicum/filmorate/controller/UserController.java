@@ -35,9 +35,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<User> getCommonFriends(@PathVariable("id") int id, @PathVariable("otherId") int otherId){
+    public Set<User> getCommonFriends(@PathVariable("id") int id, @PathVariable("otherId") int otherId) {
         return userService.getCommonFriends(id, otherId);
-    } 
+    }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
