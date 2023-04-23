@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Map;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -30,12 +33,51 @@ public class UserService {
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
 
-        return Map.of("Friends", userId + " : " + friendId);
+        return Map.of("Success","Now friends " + userId + " : " + friendId);
     }
 
+    public Map<String, String> deleteFriend(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+        if (user == null) {
+            throw new ValidationException404("Id " + userId + " не найден в списке пользователей");
+        } else if (friend == null) {
+            throw new ValidationException404("Id " + friendId + " не найден в списке пользователей");
+        }
+
+        if (!user.getFriends().contains(friendId) && !friend.getFriends().contains(userId))
+            throw new ValidationException400(MessageFormat.format("{0} и {1} не друзья, удаление невозможно",
+                    user.getName(), friend.getName()));
+        else {
+            user.getFriends().remove(friendId);
+            friend.getFriends().remove(userId);
+            return Map.of("Success","Not friends anymore " +  userId + " : " + friendId);
+        }
+
+    }
 
     public UserStorage getUserStorage() {
         return userStorage;
+    }
+
+    public Set<User> getUserFriends(int userId) {
+        Set<Integer> friends = getUserStorage().getUserById(userId).getFriends();
+        Set<User> userFriends = new TreeSet<>((o1, o2) -> {
+            if(o1.getId()>o2.getId()) return 1;
+            else if (o2.getId()>o1.getId()) return -1;
+            return 0;
+        });
+        friends.stream()
+                .map(friend -> getUserStorage().getUserById(friend)).forEach(userFriends::add);
+        return userFriends;
+    }
+
+    public Set<User> getCommonFriends(int userId, int friendId) {
+        Set<User> userFriends = getUserFriends(userId);
+        Set<User> friendFriends = getUserFriends(friendId);
+        Set<User> intersection = new HashSet<>(userFriends);
+        intersection.retainAll(friendFriends);
+        return intersection;
     }
 }
 //    Создайте UserService, который будет отвечать за такие операции с пользователями,

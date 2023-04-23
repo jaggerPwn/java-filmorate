@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
+import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -61,7 +62,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(int id) {
-        User user = users.get(id);
-        return users.get(id);
+        User user = null;
+        for (User value : users.values()) {
+            if (value.getId() == id) user = value;
+        }
+
+        if(user == null) throw new ValidationException404("No such user id: " + id);
+        return user;
     }
 }
