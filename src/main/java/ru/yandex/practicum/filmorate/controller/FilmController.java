@@ -56,7 +56,3 @@ public class FilmController {
         return filmService.deleteLike(filmId, userId);
     }
 }
-//
-//        PUT    /films/{id}/like/{userId} — пользователь ставит лайк фильму.
-//        DELETE /films/{id}/like/{userId} — пользователь удаляет лайк.
-//        GET /films/popular?count={count} — возвращает список из первых count фильмов по количеству лайков. Если значение параметра count не задано, верните первые 10.
