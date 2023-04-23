@@ -8,12 +8,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 @Data
@@ -30,8 +28,9 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
     Set<Integer> friends = new TreeSet<>((o1, o2) -> {
-        if(o1>o2) return 1;
-        else if (o2>o1) return -1;
+        if (o1 > o2) return 1;
+        else if (o2 > o1) return -1;
         return 0;
     });
+    Set<Film> filmLikes = new HashSet<>();
 }

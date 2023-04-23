@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,16 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.model.User;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -108,12 +106,9 @@ public class UserServiceTests {
         mapper.registerModule(new JavaTimeModule());
         MvcResult mvcResult1 = mockMvc.perform(get("/users/1")).andReturn();
         User user0 = mapper.readValue(mvcResult1.getResponse().getContentAsString(), User.class);
-        MvcResult mvcResult2 = mockMvc.perform(get("/users/2")).andReturn();
-        User user1 = mapper.readValue(mvcResult2.getResponse().getContentAsString(), User.class);
         MvcResult mvcResult3 = mockMvc.perform(get("/users/3")).andReturn();
         User user2 = mapper.readValue(mvcResult3.getResponse().getContentAsString(), User.class);
         MvcResult mvcResult4 = mockMvc.perform(get("/users/2/friends")).andReturn();
-        List<User> list = mapper.readValue(mvcResult4.getResponse().getContentAsString(), new TypeReference<>() {});
         Assert.assertEquals(user0.getEmail(), "mail@yandex.ru");
         Assert.assertEquals(user0.getName(), "est adipisicing");
         Assert.assertEquals(user0.getLogin(), "doloreUpdate");

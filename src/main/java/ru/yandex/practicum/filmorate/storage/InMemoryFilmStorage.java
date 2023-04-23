@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
+import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -47,6 +48,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         films.put(film.getId(), film);
         return film;
+    }
+
+    @Override
+    public Film getFilmById(int filmId) {
+        if (films.get(filmId) == null) throw new ValidationException404("Фильм " + filmId + "не найден");
+        return films.get(filmId);
     }
 
     private static boolean filmDateIsBefore(Film film) {
