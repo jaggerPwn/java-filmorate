@@ -10,6 +10,8 @@ public interface UserStorage {
 
     User create(User user);
 
+    void setId(int id);
+
     User put(User user);
 
     Map<Integer, User> getUsers();

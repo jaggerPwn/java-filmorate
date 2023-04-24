@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
@@ -13,13 +12,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Repository
 public class InMemoryFilmStorage implements FilmStorage {
-    UserStorage userStorage;
+    private final UserStorage userStorage;
     private final Map<Integer, Film> films = new HashMap<>();
     private int id = 0;
 
-    @Autowired
     public InMemoryFilmStorage(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
@@ -29,6 +27,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
+    @Override
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public Film create(Film film) {
@@ -56,7 +58,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(filmId);
     }
 
-    private static boolean filmDateIsBefore(Film film) {
+    private boolean filmDateIsBefore(Film film) {
 
         return film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateTimeFormatter.ISO_LOCAL_DATE));
     }

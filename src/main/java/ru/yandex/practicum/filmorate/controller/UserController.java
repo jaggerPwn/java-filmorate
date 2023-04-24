@@ -58,4 +58,9 @@ public class UserController {
     public Map<String, String> deleteFriend(@PathVariable("userId") int userId, @PathVariable("friendId") int friendId) {
         return userService.deleteFriend(userId, friendId);
     }
+
+    @DeleteMapping
+    public Map<Integer, User> deleteAll() {
+        return userService.deleteAll();
+    }
 }

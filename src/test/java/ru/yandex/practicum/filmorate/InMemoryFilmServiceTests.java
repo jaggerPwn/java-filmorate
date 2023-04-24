@@ -27,14 +27,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FilmServiceTests {
+public class InMemoryFilmServiceTests {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext wac;
 
     @Before
-    public void setupMockMvc() {
+    public void setupMockMvc() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
 
     @Test
@@ -86,7 +88,6 @@ public class FilmServiceTests {
     private void likeFilm(MockMvc mockMvc, int filmId, int userId) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(MessageFormat.format("/films/{0}/like/{1}", filmId, userId)));
     }
-
 
     private void createTwoFilms() throws Exception {
         String jsonStr = "{\n" +

@@ -55,4 +55,9 @@ public class FilmController {
     public Film deleteLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
         return filmService.deleteLike(filmId, userId);
     }
+
+    @DeleteMapping
+    public Collection<Film> deleteAll() {
+        return filmService.deleteAll();
+    }
 }

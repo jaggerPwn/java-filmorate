@@ -26,14 +26,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserServiceTests {
+public class InMemoryUserServiceTests {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext wac;
 
     @Before
-    public void setupMockMvc() {
+    public void setupMockMvc() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
+
     }
 
     @Test
