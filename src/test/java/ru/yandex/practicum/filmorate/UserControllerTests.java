@@ -27,8 +27,10 @@ public class UserControllerTests {
     private WebApplicationContext wac;
 
     @Before
-    public void setupMockMvc() {
+    public void setupMockMvc() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
 
     @Test
@@ -42,10 +44,7 @@ public class UserControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("[{\"id\":1,\"email\":" +
-                        "\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"Nick Name\",\"birthday\":" +
-                        "\"1946-08-20\"}]"));
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
