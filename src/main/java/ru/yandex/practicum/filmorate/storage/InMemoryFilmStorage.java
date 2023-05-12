@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (filmDateIsBefore(film)) {
-            throw new ValidationException400("дата релиза должна быть не раньше 28 декабря 1895 года");
+            throw new ValidationException400("release date must be no earlier than December 28, 1895");
         }
         film.setId(++id);
         films.put(film.getId(), film);
@@ -54,7 +54,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(int filmId) {
-        if (films.get(filmId) == null) throw new ValidationException404("Фильм " + filmId + "не найден");
+        if (films.get(filmId) == null) throw new ValidationException404("Movie " + filmId + " not found");
         return films.get(filmId);
     }
 

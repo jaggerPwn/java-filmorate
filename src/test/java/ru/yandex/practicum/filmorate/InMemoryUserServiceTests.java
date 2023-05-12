@@ -70,6 +70,7 @@ public class InMemoryUserServiceTests {
     public void getUserFriends() throws Exception {
         createThreeFriends();
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/friends/2"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/friends/1"));
         mockMvc.perform(MockMvcRequestBuilders.get("/users/1/friends"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         ObjectMapper mapper = new ObjectMapper();
@@ -86,8 +87,11 @@ public class InMemoryUserServiceTests {
     public void getCommonFriends() throws Exception {
         createThreeFriends();
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/friends/2"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/friends/1"));
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/friends/3"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/friends/1"));
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/friends/3"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/friends/2"));
         mockMvc.perform(MockMvcRequestBuilders.get("/users/1/friends/common/3"))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         MvcResult mvcResult = mockMvc.perform(get("/users/1/friends/common/2")).andReturn();
@@ -131,7 +135,7 @@ public class InMemoryUserServiceTests {
                 "    \"login\": \"doloreUpdate\",\n" +
                 "    \"name\": \"est adipisicing\",\n" +
                 "    \"birthday\": \"1976-09-20\",\n" +
-                "    \"friends\": []\n" +
+                "    \"friends\": {}\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")

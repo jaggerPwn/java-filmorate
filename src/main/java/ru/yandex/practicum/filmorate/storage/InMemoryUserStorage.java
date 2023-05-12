@@ -31,9 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ValidationException400("Дата рождения не может быть в будущем");
         }
 
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        } else if (user.getName().equals("")) {
+        if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
         user.setId(++id);

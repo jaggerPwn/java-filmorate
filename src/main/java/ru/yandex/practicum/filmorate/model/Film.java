@@ -22,4 +22,6 @@ public class Film {
     private int duration;
     @Min(0)
     private int likes;
+    private Genre genre;
+    private Rating rating;
 }

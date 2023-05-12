@@ -19,10 +19,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.text.MessageFormat;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
@@ -78,11 +80,18 @@ public class InMemoryFilmServiceTests {
                 .andReturn();
         list = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
+
+        ////
+        MvcResult mvcResult2 = mockMvc.perform(get("/users"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        List<User> list2 = mapper.readValue(mvcResult2.getResponse().getContentAsString(), new TypeReference<>() {
+        });
+        ////
         Assert.assertEquals(list.size(), 10);
         Assert.assertEquals(list.get(0).getLikes(), 3);
         Assert.assertEquals(list.get(2).getLikes(), 1);
         Assert.assertEquals(list.get(3).getLikes(), 0);
-
     }
 
     private void likeFilm(MockMvc mockMvc, int filmId, int userId) throws Exception {
@@ -113,35 +122,49 @@ public class InMemoryFilmServiceTests {
 
 
     private void createThreeUsers() throws Exception {
-        String jsonStr = "{\n" +
-                "    \"id\": 1,\n" +
-                "    \"email\": \"mail@yandex.ru\",\n" +
-                "    \"login\": \"doloreUpdate\",\n" +
-                "    \"name\": \"est adipisicing\",\n" +
-                "    \"birthday\": \"1976-09-20\",\n" +
-                "    \"friends\": []\n" +
-                "}";
+        String jsonStr =
+                "{\n" +
+                        "    \"id\": 1,\n" +
+                        "    \"email\": \"mail@mail.ru\",\n" +
+                        "    \"login\": \"dolore\",\n" +
+                        "    \"name\": \"Nick Name\",\n" +
+                        "    \"birthday\": \"1946-08-20\",\n" +
+                        "    \"friends\": {}\n" +
+                        "}";
+
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()));
+                .
 
-        jsonStr = "{\n" +
-                "  \"login\": \"friend\",\n" +
-                "  \"name\": \"friend adipisicing\",\n" +
-                "  \"email\": \"friend@mail.ru\",\n" +
-                "  \"birthday\": \"1976-08-20\"\n" +
-                "}";
+    contentType(MediaType.APPLICATION_JSON).
+
+    content(jsonStr.getBytes()));
+
+    jsonStr ="{\n"+
+            "  \"login\": \"friend\",\n"+
+            "  \"name\": \"friend adipisicing\",\n"+
+            "  \"email\": \"friend@mail.ru\",\n"+
+            "  \"birthday\": \"1976-08-20\"\n"+
+            "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()));
-        jsonStr = "{\n" +
-                "  \"login\": \"common\",\n" +
-                "  \"name\": \"\",\n" +
-                "  \"email\": \"friend@common.ru\",\n" +
-                "  \"birthday\": \"2000-08-20\"\n" +
-                "}";
+                .
+
+    contentType(MediaType.APPLICATION_JSON).
+
+    content(jsonStr.getBytes()));
+    jsonStr ="{\n"+
+            "  \"login\": \"common\",\n"+
+            "  \"name\": \"\",\n"+
+            "  \"email\": \"friend@common.ru\",\n"+
+            "  \"birthday\": \"2000-08-20\"\n"+
+            "}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()));
-    }
+                .
+
+    contentType(MediaType.APPLICATION_JSON).
+
+    content(jsonStr.getBytes()));
+}
 
 }
