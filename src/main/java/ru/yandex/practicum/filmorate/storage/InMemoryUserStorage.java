@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
@@ -45,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User put(User user) {
+    public User update(User user) {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException500("Дата рождения не может быть в будущем");
         }
@@ -58,11 +59,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Integer, User> getUsers() {
-        return users;
-    }
-
-    @Override
     public User getUserById(int id) {
         User user = null;
         for (User value : users.values()) {
@@ -71,5 +67,10 @@ public class InMemoryUserStorage implements UserStorage {
 
         if (user == null) throw new ValidationException404("No such user id: " + id);
         return user;
+    }
+
+    @Override
+    public void clear() {
+
     }
 }

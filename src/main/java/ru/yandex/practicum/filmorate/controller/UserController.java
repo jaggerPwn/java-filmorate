@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -12,6 +13,7 @@ import java.util.*;
 @RestController
 @Slf4j
 @RequestMapping("/users")
+
 public class UserController {
     private final UserService userService;
 
@@ -46,7 +48,7 @@ public class UserController {
 
     @PutMapping
     public User put(@RequestBody User user) {
-        return userService.getUserStorage().put(user);
+        return userService.getUserStorage().update(user);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
@@ -60,7 +62,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public Map<Integer, User> deleteAll() {
+    public Collection<User> deleteAll() {
         return userService.deleteAll();
     }
 }

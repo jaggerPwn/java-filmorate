@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
@@ -12,10 +15,9 @@ import java.util.*;
 
 @Service
 public class InMemoryUserService implements UserService {
-
     UserStorage userStorage;
-
-    public InMemoryUserService(UserStorage userStorage) {
+    @Autowired
+    public InMemoryUserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -116,9 +118,9 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public Map<Integer, User> deleteAll() {
-        userStorage.getUsers().clear();
+    public Collection<User> deleteAll() {
+        userStorage.clear();
         userStorage.setId(0);
-        return userStorage.getUsers();
+        return userStorage.findAll();
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@SpringJUnitConfig({TransferServiceConfig.class})
 
 public class FilmControllerTests {
     @Autowired
@@ -79,7 +82,7 @@ public class FilmControllerTests {
         JsonArray array = jsonElement.getAsJsonArray();
         HashMap<Integer, User> users = new HashMap<>();
         for (JsonElement element : array) {
-            User user = new User();
+            User user = User.builder().build();
             int id = element.getAsJsonObject().get("id").getAsInt();
             user.setId(id);
             user.setName(element.getAsJsonObject().get("name").getAsString());
