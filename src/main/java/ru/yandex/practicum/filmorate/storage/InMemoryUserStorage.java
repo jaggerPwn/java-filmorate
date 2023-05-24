@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
@@ -14,17 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-@Primary
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int id = 0;
-
 
     @Override
     public Collection<User> findAll() {
         return users.values();
     }
-
 
     @Override
     public User create(User user) {
