@@ -4,7 +4,6 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -43,7 +42,7 @@ public class FilmController {
 
     @PutMapping
     public Film put(@RequestBody Film film) {
-        return filmService.getFilmStorage().put(film);
+        return filmService.getFilmStorage().update(film);
     }
 
     @PutMapping("/{id}/like/{userId}")

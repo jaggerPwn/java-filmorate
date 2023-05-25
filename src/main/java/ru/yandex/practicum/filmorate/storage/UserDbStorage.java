@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.ValidationException400;
+import ru.yandex.practicum.filmorate.exception.ValidationException404;
+import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Collection;
 
 @Repository
@@ -31,6 +36,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException400("Дата рождения не может быть в будущем");
+        }
+
+        if (user.getName() == null || user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
         String sqlQuery = "insert into USERS(EMAIL, LOGIN, NAME, BIRTHDAY) " +
                 "values (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -54,22 +66,34 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException500("Дата рождения не может быть в будущем");
+        }
+
         String sqlQuery = "update USERS set " +
                 "USER_ID = ?, EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? " +
-                "where USER_ID = " + user.getId();
-        jdbcTemplate.update(sqlQuery
+                "where USER_ID = ?";
+        int update = jdbcTemplate.update(sqlQuery
                 , user.getId()
                 , user.getEmail()
                 , user.getLogin()
                 , user.getName()
-                , user.getBirthday());
+                , user.getBirthday()
+                , user.getId());
+        if (update < 1) throw new ValidationException404("user" + user.getId() + " not found");
         return user;
     }
 
     @Override
     public User getUserById(int userId) {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS where USER_ID =  ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+        User user;
+        try {
+            user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+        } catch (DataAccessException e) {
+            throw new ValidationException404("user " + userId + " not found");
+        }
+        return user;
     }
 
     @Override

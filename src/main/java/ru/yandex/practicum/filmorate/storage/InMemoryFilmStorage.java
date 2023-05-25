@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public Film put(Film film) {
+    public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
             throw new ValidationException500("No such film id: " + film.getId());
         }
@@ -61,6 +61,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film getFilmById(int filmId) {
         if (films.get(filmId) == null) throw new ValidationException404("Movie " + filmId + " not found");
         return films.get(filmId);
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     private boolean filmDateIsBefore(Film film) {
