@@ -137,7 +137,6 @@ public class FilmDbStorage implements FilmStorage {
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("NAME"))
                 .description(resultSet.getString("DESCRIPTION"))
-                //TODO разобраться почему если в базе null то выдаёт null Pointer
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .duration(resultSet.getInt("DURATION"))
                 .build();

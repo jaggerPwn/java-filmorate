@@ -31,7 +31,7 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> findAll() {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS";
 
-        return jdbcTemplate.query(sqlQuery, UserDbStorage.this::mapRowToUser);
+        return jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS where USER_ID =  ?";
         User user;
         try {
-            user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+            user = jdbcTemplate.queryForObject(sqlQuery, UserDbStorage::mapRowToUser, userId);
         } catch (DataAccessException e) {
             throw new ValidationException404("user " + userId + " not found");
         }
@@ -101,7 +101,7 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update("delete from USERS where USER_ID > 3");
     }
 
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    public static User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("USER_ID"))
                 .email(resultSet.getString("EMAIL"))

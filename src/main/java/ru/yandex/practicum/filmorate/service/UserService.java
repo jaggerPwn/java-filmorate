@@ -14,7 +14,7 @@ public interface UserService {
 
     UserStorage getUserStorage();
 
-    Set<User> getUserFriends(int userId);
+    Collection<User> getUserFriends(int userId);
 
     Set<User> getCommonFriends(int userId, int friendId);
 

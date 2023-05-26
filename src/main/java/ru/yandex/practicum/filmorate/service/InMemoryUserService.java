@@ -92,7 +92,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public Set<User> getUserFriends(int userId) {
+    public Collection<User> getUserFriends(int userId) {
         TreeMap<Integer, Integer> friends = getUserStorage().getUserById(userId).getFriends();
         Set<User> userFriends = new TreeSet<>((o1, o2) -> {
             if (o1.getId() > o2.getId()) return 1;
@@ -109,8 +109,8 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public Set<User> getCommonFriends(int userId, int friendId) {
-        Set<User> userFriends = getUserFriends(userId);
-        Set<User> friendFriends = getUserFriends(friendId);
+        Set<User> userFriends = (Set<User>) getUserFriends(userId);
+        Set<User> friendFriends = (Set<User>) getUserFriends(friendId);
         Set<User> intersection = new HashSet<>(userFriends);
         intersection.retainAll(friendFriends);
         return intersection;

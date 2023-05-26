@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.*;
 
 @Service
@@ -33,65 +35,103 @@ public class DbUserService implements UserService {
     @Override
     public Map<String, String> addFriend(int userId, int friendId) {
         String sqlQuery1 = "SELECT USER_ID FROM USERS u WHERE USER_ID = ?";
+        Integer userIdDB;
+        Integer friendIdDB;
         try {
-            Integer userIdDB = jdbcTemplate.queryForObject(sqlQuery1, Integer.class, userId);
+            userIdDB = jdbcTemplate.queryForObject(sqlQuery1, Integer.class, userId);
         } catch (DataAccessException e) {
             throw new ValidationException404("user not found, ID " + userId);
         }
         try {
-            Integer userIdDB = jdbcTemplate.queryForObject(sqlQuery1, Integer.class, friendId);
+            friendIdDB = jdbcTemplate.queryForObject(sqlQuery1, Integer.class, friendId);
         } catch (DataAccessException e) {
             throw new ValidationException404("friend not found, ID " + friendId);
         }
+        if (userIdDB == friendIdDB) throw new ValidationException400("User cannot invite himself");
+        String sqlUserFriendArray;
+        String sqlFriendFriendsArray;
+        String sqlAddFriend;
+        String sqlUpdateToAccepted;
 
-        String sqlUserFriendArray = "SELECT USER_ID, FRIEND_ID, STATUS FROM FRIENDS f WHERE USER_ID = ?";
-        Integer[] friendArray = null;
+        int friendAcceptanceStatus = -1;
+        int userAcceptanceStatus = -1;
+
+        Integer[] userFriendArray = new Integer[3];
+        Integer[] friendFriendsArray = new Integer[3];
+
         try {
-            friendArray = jdbcTemplate.queryForObject(sqlUserFriendArray, this::mapRowToArray, userId);
+            sqlUserFriendArray = "SELECT USER_ID, FRIEND_ID, STATUS FROM FRIENDS WHERE USER_ID IN (?) AND FRIEND_ID IN (?) AND STATUS IN (0)";
+            userFriendArray = jdbcTemplate.queryForObject(sqlUserFriendArray, this::mapRowToSimpleArray, userId, friendId);
         } catch (DataAccessException ignored) {
-            throw new RuntimeException(ignored);
         }
-        if (friendArray != null) {
-            if (friendArray[2] == 1) throw new ValidationException400(userId + " already friends with " + friendId);
-            else if (friendArray[2] == 0)
-                throw new ValidationException400(userId + " already sent invitation for user " + friendId);
-        } else {
-            String sqlFriendFriendsArray = "SELECT USER_ID, FRIEND_ID, STATUS FROM FRIENDS f WHERE USER_ID = ?";
-            Integer[] friendFriendsArray = null;
-
-
-            String sqlAddFriend = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, ?)";
-            jdbcTemplate.update(sqlAddFriend, userId, friendId, 0);
+        try {
+            sqlFriendFriendsArray = "SELECT USER_ID, FRIEND_ID, STATUS FROM FRIENDS WHERE USER_ID IN (?) AND FRIEND_ID IN (?) AND STATUS IN (0)";
+            friendFriendsArray = jdbcTemplate.queryForObject(sqlFriendFriendsArray, this::mapRowToSimpleArray, friendId, userId);
+        } catch (DataAccessException ignored) {
         }
-        return Map.of("Success", String.format("Friend invitation sent from %d to %d", userId, friendId));
+        if (userFriendArray[0] == null && friendFriendsArray[0] == null) {
+            sqlAddFriend = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, 0)";
+            userAcceptanceStatus = jdbcTemplate.update(sqlAddFriend, userId, friendId);
+            return Map.of("Success", String.format(MessageFormat.format("invitation sent userAcceptanceStatus = {0}, friendAcceptanceStatus = {1}", userAcceptanceStatus, friendAcceptanceStatus)));
+        }
+        else if (userFriendArray[0] != null) {
+            throw new ValidationException400(userId + " already sent invitation to " + friendId);
+        }
+        else {
+            if (friendFriendsArray[2] == 1)
+                throw new ValidationException400(userId + " already friends with " + friendId);
+            sqlUpdateToAccepted = "UPDATE FRIENDS f SET STATUS = 1 WHERE f.USER_ID IN (?) AND f.FRIEND_ID IN (?) AND STATUS IN (0)";
+            friendAcceptanceStatus = jdbcTemplate.update(sqlUpdateToAccepted, friendId, userId);
+            userAcceptanceStatus = 1;
+            return Map.of("Success", String.format(MessageFormat.format("now friends userAcceptanceStatus = {0}, friendAcceptanceStatus = {1}", userAcceptanceStatus, friendAcceptanceStatus)));
+        }
     }
 
     @Override
     public Map<String, String> deleteFriend(int userId, int friendId) {
+        String sqlQuery = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+        jdbcTemplate.update(sqlQuery, userId, friendId);
         return null;
     }
 
     @Override
     public UserStorage getUserStorage() {
-        return null;
+        return userStorage;
     }
 
     @Override
-    public Set<User> getUserFriends(int userId) {
-        return null;
+    public Collection<User> getUserFriends(int userId) {
+        String sqlQuery = "select u.USER_ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY\n" +
+                "FROM USERS u \n" +
+                "LEFT JOIN FRIENDS f ON f.FRIEND_ID = u.USER_ID \n" +
+                "WHERE f.USER_ID = ? AND f.STATUS = 1";
+        List<User> friendList = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, userId);
+        return friendList;
     }
 
     @Override
     public Set<User> getCommonFriends(int userId, int friendId) {
-        return null;
+        String sqlQuery = "select u.USER_ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY\n" +
+                "FROM USERS u \n" +
+                "LEFT JOIN FRIENDS f ON f.FRIEND_ID = u.USER_ID \n" +
+                "WHERE f.USER_ID = ? AND f.STATUS = 1";
+        List<User> friendList1 = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, userId);
+        List<User> friendList2 = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, friendId);
+        Set<User> intersection = new HashSet<>(friendList1);
+        intersection.retainAll(friendList2);
+        return intersection;
     }
 
     @Override
     public Collection<User> deleteAll() {
-        return null;
+        String sqlQuery = "DELETE FROM FRIENDS";
+        jdbcTemplate.update(sqlQuery);
+        sqlQuery = "DELETE FROM USERS";
+        jdbcTemplate.update(sqlQuery);
+        return userStorage.findAll();
     }
 
-    private Integer[] mapRowToArray(ResultSet resultSet, int i) {
+    private Integer[] mapRowToSimpleArray(ResultSet resultSet, int i) {
         Integer[] integers = new Integer[3];
         try {
             integers[0] = resultSet.getInt("USER_ID");
@@ -100,7 +140,6 @@ public class DbUserService implements UserService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
         return integers;
     }
 }
