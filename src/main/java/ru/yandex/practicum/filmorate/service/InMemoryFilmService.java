@@ -19,8 +19,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Autowired
     public InMemoryFilmService(FilmStorage filmStorage,
-                               //TODO заменить на inMemoryUserStorage
-                               @Qualifier("userDbStorage") UserStorage userStorage) {
+                               @Qualifier("inMemoryUserStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -31,7 +30,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
+    public Collection<Film> getPopularFilms(Integer count) {
         if (count < 1)
             throw new ValidationException400("Запрошено количество популярных фильмов меньше одного: " + count);
         Collection<User> all = userStorage.findAll();
@@ -43,8 +42,8 @@ public class InMemoryFilmService implements FilmService {
                 else allFilmLikes.put(film, allFilmLikes.get(film) + 1);
             }
         }
-        Set<Film> films = allFilmLikes.keySet();
-        return (List<Film>) films;
+        Collection<Film> films = allFilmLikes.keySet();
+        return films;
     }
 
     @Override

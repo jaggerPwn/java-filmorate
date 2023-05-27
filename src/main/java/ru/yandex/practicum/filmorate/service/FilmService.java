@@ -4,12 +4,11 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface FilmService {
     FilmStorage getFilmStorage();
 
-    List<Film> getPopularFilms(Integer count);
+    Collection<Film> getPopularFilms(Integer count);
 
     Film addLike(int filmId, int userId);
 
