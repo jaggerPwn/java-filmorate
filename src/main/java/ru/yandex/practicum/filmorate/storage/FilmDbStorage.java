@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Primary
@@ -41,32 +42,12 @@ public class FilmDbStorage implements FilmStorage {
                 "                f.DURATION,\n" +
                 "                m.MPA_ID \n" +
                 "                from FILMS f\n" +
-                "                LEFT JOIN MPA m ON f.FILM_ID = m.FILM_ID";
+                "                LEFT JOIN MPA_FILM mf ON f.FILM_ID = mf.FILM_ID \n" +
+                "                LEFT JOIN MPA m ON mf.MPA_ID = m.MPA_ID";
         List<Film> query = jdbcTemplate.query(sqlQuery, FilmDbStorage::mapRowToFilm);
 
-        String sqlMapFilmToGenre = "select \n" +
-                "                g.FILM_ID, \n" +
-                "                g.NAME, \n" +
-                "                g.GENRE_ID \n" +
-                "                from FILMS f\n" +
-                "                JOIN GENRES g ON f.FILM_ID = g.FILM_ID";
-
-        var stringObjectMap = jdbcTemplate.queryForList(sqlMapFilmToGenre);
-//        for (Map<String, Object> map : stringObjectMap) {
-//            for (Map.Entry<String, Object> entry : map.entrySet()) {
-//                if "FilMID" + entry.getValue());
-//                if NAME
-//                        if GENRE_ID
-//            }
-//
-//            }
-
+        setGenresForFilms(query);
         return query;
-    }
-
-    private static Map<String, List<Genres>> mapToGetAllGeneresVsFilms(int filmId, int genreId, String name){
-
-        return null;
     }
 
     @Override
@@ -142,19 +123,27 @@ public class FilmDbStorage implements FilmStorage {
         } catch (DataAccessException e) {
             throw new ValidationException404("film not found");
         }
+        selectMpaNGenre(filmId, film);
+        return film;
+    }
+
+    private void selectMpaNGenre(int filmId, Film film) {
         String sqlQueryForGenre = "SELECT g.GENRE_ID, g.NAME  FROM GENRES g LEFT JOIN FILMS f ON f.FILM_ID = g.FILM_ID WHERE f.FILM_ID = ?";
         try {
             Collection<Genres> genresCollection = jdbcTemplate.query(sqlQueryForGenre, FilmDbStorage::mapRowToGenre, filmId);
             film.setGenres(genresCollection);
         } catch (DataAccessException ignored) {
         }
-        String sqlQueryForMPA = "SELECT m.MPA_ID, m.NAME  FROM MPA m LEFT JOIN FILMS f ON f.FILM_ID = m.FILM_ID WHERE f.FILM_ID = ?";
+        String sqlQueryForMPA = "SELECT m.MPA_ID, m.NAME  \n" +
+                "        FROM MPA m \n" +
+                "        LEFT JOIN MPA_FILM mf ON m.MPA_ID = mf.MPA_ID\n" +
+                "        LEFT JOIN FILMS f ON f.FILM_ID = mf.FILM_ID \n" +
+                "        WHERE mf.FILM_ID = ?";
         try {
             List<Mpa> query = jdbcTemplate.query(sqlQueryForMPA, FilmDbStorage::mapRowToMpa, filmId);
             film.setMpa(query.get(0));
         } catch (DataAccessException | IndexOutOfBoundsException ignored) {
         }
-        return film;
     }
 
     private static Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
@@ -167,18 +156,20 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void clear() {
-        jdbcTemplate.update("delete from FILMS where FILM_ID > 3");
+        jdbcTemplate.update("DELETE FROM MPA_FILM");
+        jdbcTemplate.update("DELETE FROM FILMS");
     }
 
 
     public static Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-
+        ArrayList<Genres> genres = new ArrayList<>();
         Film film = Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("NAME"))
                 .description(resultSet.getString("DESCRIPTION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .duration(resultSet.getInt("DURATION"))
+                .genres(genres)
                 .build();
         try {
             int mpa_id = resultSet.getInt("MPA_ID");
@@ -186,6 +177,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setMpa(mpa);
         } catch (SQLException ignored) {
         }
+
 
 
         return film;
@@ -212,26 +204,55 @@ public class FilmDbStorage implements FilmStorage {
             String sqlForMPA = "INSERT INTO MPA (MPA_ID, NAME, FILM_ID) VALUES (?, ?, ?)";
             update = jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getMpa().getName(), film.getId());
         } catch (DataAccessException | NullPointerException ignored) {
-ignored.printStackTrace();
+            ignored.printStackTrace();
         }
     }
 
 
     private void updateUpMpaAndGeneres(Film film) {
-        String sqlForGenre = "UPDATE GENRES SET GENRE_ID = ?, NAME = ? WHERE FILM_ID = ?";
+        String sqlForGenre = "UPDATE GENRES_FILM SET GENRE_ID = ? WHERE FILM_ID = ?";
         try {
             for (Genres genre : film.getGenres()) {
-                jdbcTemplate.update(sqlForGenre, genre.getId(), genre.getName(), film.getId());
+                jdbcTemplate.update(sqlForGenre, genre.getId(), film.getId());
             }
         } catch (DataAccessException | NullPointerException ignored) {
-            jdbcTemplate.update(sqlForGenre, 0, "UNKNOWN", film.getId());
+            String sqlForGenreDel = "DELETE FROM GENRES_FILM WHERE FILM_ID = ?";
+            jdbcTemplate.update(sqlForGenreDel, film.getId());
         }
         int update;
         try {
-            String sqlForMPA = "UPDATE MPA SET  MPA_ID = ?, NAME = ?, FILM_ID = ?";
-            update = jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getMpa().getName(), film.getId());
+            String sqlForMPA = "UPDATE MPA_FILM SET  MPA_ID = ?, FILM_ID = ?";
+            update = jdbcTemplate.update(sqlForMPA, film.getMpa().getId(),film.getId());
         } catch (DataAccessException | NullPointerException ignored) {
             ignored.printStackTrace();
+        }
+    }
+
+    private void setGenresForFilms(List<Film> query) {
+        String sqlMapFilmToGenre = "select \n" +
+                "                   gf.FILM_ID, \n" +
+                "                   g.NAME, \n" +
+                "                   g.GENRE_ID \n" +
+                "                   from FILMS f\n" +
+                "                   JOIN GENRES_FILM gf ON gf.FILM_ID = f.FILM_ID\n" +
+                "                   JOIN GENRES g ON gf.GENRE_ID = g.GENRE_ID ";
+        Collection<Genres> genres = new ArrayList<>();
+        var stringObjectMap = jdbcTemplate.queryForList(sqlMapFilmToGenre);
+
+        Map<ArrayList<Integer>, Genres> filmAllGenres = new HashMap<>();
+        for (Map<String, Object> map : stringObjectMap) {
+            Integer genId = 0;
+            Integer filmId = 0;
+            String genName = null;
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (entry.getKey().equals("FILM_ID")) filmId = Integer.parseInt(String.valueOf(entry.getValue()));
+                if (entry.getKey().equals("NAME")) genName = genName = String.valueOf(entry.getValue());
+                if (entry.getKey().equals("GENRE_ID")) genId = Integer.parseInt(String.valueOf(entry.getValue()));
+            }
+            Genres genres1 = Genres.builder().id(genId).name(genName).build();
+            Integer finalFilmId = filmId;
+            Film film1 = query.stream().filter(film -> film.getId() == finalFilmId).findFirst().get();
+            film1.getGenres().add(genres1);
         }
     }
 

@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         return filmService.getFilmStorage().create(film);
@@ -56,6 +58,7 @@ public class FilmController {
 
     @DeleteMapping
     public Collection<Film> deleteAll() {
+        filmService.getFilmStorage().clear();
         return filmService.deleteAll();
     }
 }

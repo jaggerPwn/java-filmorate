@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -75,5 +77,25 @@ public class InMemoryFilmService implements FilmService {
         filmStorage.findAll().clear();
         filmStorage.setId(0);
         return filmStorage.findAll();
+    }
+
+    @Override
+    public Mpa getMpa(Integer mpaID) {
+        return null;
+    }
+
+    @Override
+    public Collection<Mpa> getMpa() {
+        return null;
+    }
+
+    @Override
+    public Genres getGenres(Integer genresId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Genres> getGenres() {
+        return null;
     }
 }

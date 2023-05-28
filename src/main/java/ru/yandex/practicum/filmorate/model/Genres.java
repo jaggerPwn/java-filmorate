@@ -24,6 +24,6 @@ public class Genres {
         else if (id == 4) this.name ="THRILLER";
         else if (id == 5) this.name ="DOCUMENTARY";
         else if (id == 6) this.name ="ACTION";
-        else throw new ValidationException404("Genre not found");
+        else this.name = "";
     }
 }

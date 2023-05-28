@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import ru.yandex.practicum.filmorate.exception.ValidationException404;
 
 @Data
 @Builder
@@ -23,7 +22,7 @@ public class Mpa {
         else if (id == 3) this.name ="PG13";
         else if (id == 4) this.name ="R";
         else if (id == 5) this.name ="NC17";
-        //else throw new ValidationException404("MPA not found");
+        else this.name = "";
     }
 }
 

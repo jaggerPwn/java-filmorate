@@ -35,6 +35,6 @@ CREATE TABLE IF NOT EXISTS "FILMS" (
   "DESCRIPTION" varchar(256),
   "RELEASE_DATE" timestamp,
   "DURATION" integer,
-  "GENRE" varchar(20),
-  "RATING" varchar(10)
+  "GENRES" varchar(20),
+  "MPA" varchar(10)
 );
