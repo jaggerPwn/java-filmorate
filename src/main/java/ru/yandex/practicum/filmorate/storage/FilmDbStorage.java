@@ -77,11 +77,10 @@ public class FilmDbStorage implements FilmStorage {
             statement.setInt(4, film.getDuration());
             return statement;
         }, keyHolder);
-        film.setId(keyHolder.getKey().intValue());
+        int id = keyHolder.getKey().intValue();
+        film.setId(id);
         setUpMpaAndGeneres(film);
-
-
-        return film;
+        return getFilmById(id);
     }
 
     @Override
@@ -128,9 +127,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void selectMpaNGenre(int filmId, Film film) {
-        String sqlQueryForGenre = "SELECT g.GENRE_ID, g.NAME  FROM GENRES g LEFT JOIN FILMS f ON f.FILM_ID = g.FILM_ID WHERE f.FILM_ID = ?";
+        String sqlQueryForGenre = "SELECT gf.GENRE_ID, g.NAME \n" +
+                "FROM GENRES_FILM gf  \n" +
+                "LEFT JOIN GENRES g  ON gf.GENRE_ID = g.GENRE_ID\n" +
+                "WHERE gf.FILM_ID = ?";
+        Collection<Genres> genresCollection;
         try {
-            Collection<Genres> genresCollection = jdbcTemplate.query(sqlQueryForGenre, FilmDbStorage::mapRowToGenre, filmId);
+            genresCollection = jdbcTemplate.query(sqlQueryForGenre, FilmDbStorage::mapRowToGenre, filmId);
             film.setGenres(genresCollection);
         } catch (DataAccessException ignored) {
         }
@@ -156,6 +159,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void clear() {
+        jdbcTemplate.update("DELETE FROM GENRES_FILM");
         jdbcTemplate.update("DELETE FROM MPA_FILM");
         jdbcTemplate.update("DELETE FROM FILMS");
     }
@@ -192,17 +196,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void setUpMpaAndGeneres(Film film) {
-        String sqlForGenre = "INSERT INTO GENRES (GENRE_ID, NAME, FILM_ID) VALUES (?, ?, ?)";
+        String sqlForGenre = "INSERT INTO GENRES_FILM (GENRE_ID, FILM_ID) VALUES ( ?, ?)";
         try {
             for (Genres genre : film.getGenres()) {
-                jdbcTemplate.update(sqlForGenre, genre.getId(), genre.getName(), film.getId());
+                jdbcTemplate.update(sqlForGenre, genre.getId(), film.getId());
             }
         } catch (DataAccessException | NullPointerException ignored) {
         }
         int update;
         try {
-            String sqlForMPA = "INSERT INTO MPA (MPA_ID, NAME, FILM_ID) VALUES (?, ?, ?)";
-            update = jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getMpa().getName(), film.getId());
+            String sqlForMPA = "INSERT INTO MPA_FILM (MPA_ID, FILM_ID) VALUES ( ?, ?)";
+            update = jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getId());
         } catch (DataAccessException | NullPointerException ignored) {
             ignored.printStackTrace();
         }
@@ -210,7 +214,7 @@ public class FilmDbStorage implements FilmStorage {
 
 
     private void updateUpMpaAndGeneres(Film film) {
-        String sqlForGenre = "UPDATE GENRES_FILM SET GENRE_ID = ? WHERE FILM_ID = ?";
+        String sqlForGenre = "UPDATE GENRES_FILM SET GENRE_ID = ? WHERE FILM_ID = ?"; //TODO доделать на работе
         try {
             for (Genres genre : film.getGenres()) {
                 jdbcTemplate.update(sqlForGenre, genre.getId(), film.getId());

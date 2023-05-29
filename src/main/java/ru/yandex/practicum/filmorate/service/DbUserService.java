@@ -70,7 +70,7 @@ public class DbUserService implements UserService {
         } catch (DataAccessException ignored) {
         }
         if (userFriendArray[0] == null && friendFriendsArray[0] == null) {
-            sqlAddFriend = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, 0)";
+            sqlAddFriend = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, 1)";  //ЕСЛИ НУЖНА АВТОРИЗАЦИЯ НА ДРУЗЬЯ ПОМЕНЯТЬ ПОСЛЕДНЕЕ ЗНАЧЕНИЕ НА 0
             userAcceptanceStatus = jdbcTemplate.update(sqlAddFriend, userId, friendId);
             return Map.of("Success", String.format(MessageFormat.format("invitation sent userAcceptanceStatus = {0}, friendAcceptanceStatus = {1}", userAcceptanceStatus, friendAcceptanceStatus)));
         }
@@ -127,6 +127,9 @@ public class DbUserService implements UserService {
         String sqlQuery = "DELETE FROM FRIENDS";
         jdbcTemplate.update(sqlQuery);
         sqlQuery = "DELETE FROM USERS";
+        jdbcTemplate.update(sqlQuery);
+        sqlQuery = "ALTER TABLE  USERS  ALTER COLUMN USER_ID \n" +
+                " RESTART WITH 1";
         jdbcTemplate.update(sqlQuery);
         return userStorage.findAll();
     }

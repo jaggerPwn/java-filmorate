@@ -98,7 +98,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void clear() {
-        jdbcTemplate.update("delete from USERS where USER_ID > 3");
+        jdbcTemplate.update("delete from USERS");
     }
 
     public static User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

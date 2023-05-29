@@ -101,6 +101,10 @@ public class DbFilmServiceImpl implements FilmService {
         jdbcTemplate.update(sqlQuery);
         sqlQuery = "DELETE FROM FRIENDS";
         jdbcTemplate.update(sqlQuery);
+        sqlQuery = "ALTER TABLE  FILMS  ALTER COLUMN FILM_ID \n" +
+                " RESTART WITH 1";
+        jdbcTemplate.update(sqlQuery);
+
         return filmStorage.findAll();
     }
 
@@ -115,11 +119,13 @@ public class DbFilmServiceImpl implements FilmService {
         }
         return mpa;
     }
+
     @Override
     public Collection<Mpa> getMpa() {
         String sqlQuery = "SELECT * FROM MPA";
         return jdbcTemplate.query(sqlQuery, this::makeMPAlist);
     }
+
     @Override
     public Genres getGenres(Integer genresId) {
         String sqlQuery = "SELECT * FROM GENRES WHERE GENRE_ID = ?";
@@ -131,6 +137,7 @@ public class DbFilmServiceImpl implements FilmService {
         }
         return genres;
     }
+
     @Override
     public Collection<Genres> getGenres() {
         String sqlQuery = "SELECT * FROM GENRES";
