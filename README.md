@@ -1,3 +1,3 @@
 # java-filmorate
 Diagram for sql:
-![](src/main/resources/ERdiagram.png)
+![](src/main/resources/ERdiagram.jpg)
