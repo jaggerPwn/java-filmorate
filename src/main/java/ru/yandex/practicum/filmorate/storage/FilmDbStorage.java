@@ -203,12 +203,10 @@ public class FilmDbStorage implements FilmStorage {
             String sqlForMPA = "INSERT INTO MPA_FILM (MPA_ID, FILM_ID) VALUES ( ?, ?)";
             jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getId());
         } catch (DataAccessException | NullPointerException e) {
-            e.printStackTrace();
             String sqlForMPA = "UPDATE  MPA_FILM SET MPA_ID = ? WHERE FILM_ID = ?";
             if (film.getMpa() != null) {
                 jdbcTemplate.update(sqlForMPA, film.getMpa().getId(), film.getId());
             }
-            else {throw new ValidationException404("No MPA found"); }
         }
     }
 

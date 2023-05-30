@@ -6,16 +6,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
@@ -25,11 +29,34 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@SpringJUnitConfig({TransferServiceConfig.class})
+
 
 public class FilmControllerTests {
     @Autowired
+    private WebApplicationContext wac;
+    @Autowired
     private MockMvc mockMvc;
+
+    @Before
+    public void setupMockMvc() throws Exception {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
+    }
+
+    @BeforeEach
+    public void tearDown() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
+    }
+
+    @AfterEach
+    public void setup() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
+    }
 
     public void filmSuccessfullyReturns() throws Exception {
         String jsonStr = "{\n" +
@@ -139,7 +166,7 @@ public class FilmControllerTests {
 
         mockMvc.perform(put("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
-                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test

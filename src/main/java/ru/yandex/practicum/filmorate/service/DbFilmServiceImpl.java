@@ -97,12 +97,15 @@ public class DbFilmServiceImpl implements FilmService {
 
     @Override
     public Collection<Film> deleteAll() {
-        String sqlQuery = "DELETE FROM FILMLIKES";
+        String sqlQuery = "DELETE FROM MPA_FILM";
         jdbcTemplate.update(sqlQuery);
-        sqlQuery = "DELETE FROM FRIENDS";
+        sqlQuery = "DELETE FROM GENRES_FILM";
         jdbcTemplate.update(sqlQuery);
-        sqlQuery = "ALTER TABLE  FILMS  ALTER COLUMN FILM_ID \n" +
-                " RESTART WITH 1";
+        sqlQuery = "DELETE FROM FILMLIKES";
+        jdbcTemplate.update(sqlQuery);
+        sqlQuery = "DELETE FROM FILMS";
+        jdbcTemplate.update(sqlQuery);
+        sqlQuery = "ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1";
         jdbcTemplate.update(sqlQuery);
 
         return filmStorage.findAll();

@@ -62,7 +62,6 @@ public class UserController {
 
     @DeleteMapping
     public Collection<User> deleteAll() {
-        userService.getUserStorage().clear();
         return userService.deleteAll();
     }
 }
