@@ -39,8 +39,8 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> findAll() {
         List<Film> query = new ArrayList<>();
         String sqlQuery = "SELECT FILM_ID FROM FILMS";
-        List<Integer> film_id = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> resultSet.getInt("FILM_ID"));
-        for (Integer id : film_id) {
+        List<Integer> filmId = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> resultSet.getInt("FILM_ID"));
+        for (Integer id : filmId) {
             query.add(this.getFilmById(id));
         }
         return query;
@@ -96,13 +96,8 @@ public class FilmDbStorage implements FilmStorage {
                 "RELEASE_DATE = ?, " +
                 "DURATION = ? " +
                 "where FILM_ID = ?";
-        int update = jdbcTemplate.update(sqlQuery
-                , film.getId()
-                , film.getName()
-                , film.getDescription()
-                , film.getReleaseDate()
-                , film.getDuration()
-                , film.getId()
+        int update = jdbcTemplate.update(sqlQuery, film.getId(), film.getName(),
+                film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId()
         );
         if (update < 1) {
             throw new ValidationException404("film not found");
@@ -128,7 +123,9 @@ public class FilmDbStorage implements FilmStorage {
         }
         if (film != null) {
             selectMpaNGenre(filmId, film);
-        } else {throw new ValidationException404("film not found, id " + filmId);}
+        } else {
+            throw new ValidationException404("film not found, id " + filmId);
+        }
         return film;
     }
 
@@ -181,8 +178,8 @@ public class FilmDbStorage implements FilmStorage {
                 .genres(genres)
                 .build();
         try {
-            int mpa_id = resultSet.getInt("MPA_ID");
-            Mpa mpa = Mpa.builder().id(mpa_id).build();
+            int mpaId = resultSet.getInt("MPA_ID");
+            Mpa mpa = Mpa.builder().id(mpaId).build();
             film.setMpa(mpa);
         } catch (SQLException ignored) {
         }
@@ -229,7 +226,8 @@ public class FilmDbStorage implements FilmStorage {
                     int update1 = jdbcTemplate.update(sqlForGenre, film.getMpa().getId(), film.getId());
                     if (update1 != 0) {
                         sqlQueryForGenres = "INSERT INTO GENRES_FILM (FILM_ID, GENRE_ID) VALUES (? , ?)";
-                    jdbcTemplate.update(sqlQueryForGenres, film.getId(), genre.getId());}
+                        jdbcTemplate.update(sqlQueryForGenres, film.getId(), genre.getId());
+                    }
                 }
             }
         } catch (DataAccessException | NullPointerException ignored) {
