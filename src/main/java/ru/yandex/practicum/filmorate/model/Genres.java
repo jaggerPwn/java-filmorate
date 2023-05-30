@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import ru.yandex.practicum.filmorate.exception.ValidationException404;
 
 @Data
 @Builder
