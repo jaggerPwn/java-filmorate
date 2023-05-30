@@ -22,20 +22,22 @@ public class OtherController {
     }
 
     @GetMapping("/mpa/{id}")
-    public Mpa getMpa(@PathVariable("id") Integer mpaID){
+    public Mpa getMpa(@PathVariable("id") Integer mpaID) {
         return filmService.getMpa(mpaID);
     }
+
     @GetMapping("/mpa")
-    public Collection<Mpa> getMpa(){
+    public Collection<Mpa> getMpa() {
         return filmService.getMpa();
     }
 
     @GetMapping("/genres/{id}")
-    public Genres getGenre(@PathVariable("id") Integer mpaID){
+    public Genres getGenre(@PathVariable("id") Integer mpaID) {
         return filmService.getGenres(mpaID);
     }
+
     @GetMapping("/genres")
-    public Collection<Genres> getGenre(){
+    public Collection<Genres> getGenre() {
         return filmService.getGenres();
     }
 
