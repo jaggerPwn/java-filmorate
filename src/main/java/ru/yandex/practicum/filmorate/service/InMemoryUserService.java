@@ -15,6 +15,7 @@ import java.util.*;
 @Service
 public class InMemoryUserService implements UserService {
     UserStorage userStorage;
+
     @Autowired
     public InMemoryUserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
