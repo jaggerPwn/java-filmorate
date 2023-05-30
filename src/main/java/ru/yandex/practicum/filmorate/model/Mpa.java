@@ -16,12 +16,12 @@ public class Mpa {
 
     public Mpa(int id, String name) {
         this.id = id;
-        if(name != null) this.name = name;
-        else if (id == 1) this.name ="G";
-        else if (id == 2) this.name ="PG";
-        else if (id == 3) this.name ="PG13";
-        else if (id == 4) this.name ="R";
-        else if (id == 5) this.name ="NC17";
+        if (name != null) this.name = name;
+        else if (id == 1) this.name = "G";
+        else if (id == 2) this.name = "PG";
+        else if (id == 3) this.name = "PG13";
+        else if (id == 4) this.name = "R";
+        else if (id == 5) this.name = "NC17";
         else this.name = "";
     }
 }

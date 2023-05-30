@@ -16,13 +16,13 @@ public class Genres {
 
     public Genres(int id, String name) {
         this.id = id;
-        if(name != null) this.name = name;
-        else if (id == 1) this.name ="COMEDY";
-        else if (id == 2) this.name ="DRAMA";
-        else if (id == 3) this.name ="CARTOON";
-        else if (id == 4) this.name ="THRILLER";
-        else if (id == 5) this.name ="DOCUMENTARY";
-        else if (id == 6) this.name ="ACTION";
+        if (name != null) this.name = name;
+        else if (id == 1) this.name = "COMEDY";
+        else if (id == 2) this.name = "DRAMA";
+        else if (id == 3) this.name = "CARTOON";
+        else if (id == 4) this.name = "THRILLER";
+        else if (id == 5) this.name = "DOCUMENTARY";
+        else if (id == 6) this.name = "ACTION";
         else this.name = "";
     }
 }
