@@ -16,8 +16,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.text.MessageFormat;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
@@ -94,11 +92,8 @@ public class DbFilmServiceTests {
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                        .
-
-                contentType(MediaType.APPLICATION_JSON).
-
-                content(jsonStr.getBytes()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonStr.getBytes()));
 
         jsonStr = "{\n" +
                 "  \"login\": \"friend\",\n" +
@@ -108,11 +103,9 @@ public class DbFilmServiceTests {
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                        .
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonStr.getBytes()));
 
-                contentType(MediaType.APPLICATION_JSON).
-
-                content(jsonStr.getBytes()));
         jsonStr = "{\n" +
                 "  \"login\": \"common\",\n" +
                 "  \"name\": \"\",\n" +
@@ -120,11 +113,8 @@ public class DbFilmServiceTests {
                 "  \"birthday\": \"2000-08-20\"\n" +
                 "}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                        .
-
-                contentType(MediaType.APPLICATION_JSON).
-
-                content(jsonStr.getBytes()));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonStr.getBytes()));
     }
 
 }
