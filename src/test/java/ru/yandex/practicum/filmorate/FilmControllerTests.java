@@ -7,13 +7,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,29 +24,17 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-
+@RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
-
-
 public class FilmControllerTests {
+    private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext wac;
-    @Autowired
-    private MockMvc mockMvc;
 
     @Before
     public void setupMockMvc() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
-        mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
-    }
-
-    @BeforeEach
-    public void tearDown() throws Exception {
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
@@ -58,6 +46,7 @@ public class FilmControllerTests {
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
 
+    @Test
     public void filmSuccessfullyReturns() throws Exception {
         String jsonStr = "{\n" +
                 "  \"name\": \"nisi eiusmod\",\n" +
@@ -66,14 +55,14 @@ public class FilmControllerTests {
                 "  \"duration\": 100\n" +
                 "}";
 
-        mockMvc.perform(post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        mockMvc.perform(get("/films"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/films"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        MvcResult mvcResult = mockMvc.perform(post("/films")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonStr.getBytes())).andReturn();
 
@@ -95,12 +84,12 @@ public class FilmControllerTests {
                 "  \"duration\": 190,\n" +
                 "  \"rate\": 4\n" +
                 "}";
-        mockMvc.perform(put("/films")
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        MvcResult mvcResult = mockMvc.perform(get("/films")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonStr.getBytes())).andReturn();
 
@@ -164,7 +153,7 @@ public class FilmControllerTests {
                 "  \"duration\": 200\n" +
                 "}";
 
-        mockMvc.perform(put("/films")
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
@@ -189,7 +178,7 @@ public class FilmControllerTests {
     }
 
     private void testPostToExpect4xxError(String jsonStr) throws Exception {
-        mockMvc.perform(post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON).content(jsonStr.getBytes()))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }

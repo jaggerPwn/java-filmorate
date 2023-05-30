@@ -1,36 +1,47 @@
 
 INSERT INTO PUBLIC.MPA
-(MPA_ID, NAME)
-VALUES(1, 'G');
+SELECT 1, 'G'
+where not exists(select * from PUBLIC.MPA where MPA_ID = 1)
+;
 INSERT INTO PUBLIC.MPA
-(MPA_ID, NAME)
-VALUES(2, 'PG');
+SELECT 2, 'PG'
+where not exists(select * from PUBLIC.MPA where MPA_ID = 1)
+;
 INSERT INTO PUBLIC.MPA
-(MPA_ID, NAME)
-VALUES(3, 'PG-13');
+SELECT 3, 'PG-13'
+where not exists(select * from PUBLIC.MPA where MPA_ID = 1)
+;
 INSERT INTO PUBLIC.MPA
-(MPA_ID, NAME)
-VALUES(4, 'R');
+SELECT 4, 'R'
+where not exists(select * from PUBLIC.MPA where MPA_ID = 1)
+;
+
 INSERT INTO PUBLIC.MPA
-(MPA_ID, NAME)
-VALUES(5, 'NC-17');
+SELECT 5, 'NC-17'
+where not exists(select * from PUBLIC.MPA where MPA_ID = 1)
+;
 
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(1, 'Комедия');
+SELECT 1, 'Комедия'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(2, 'Драма');
+SELECT 2, 'Драма'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(3, 'Мультфильм');
+SELECT 3, 'Мультфильм'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(4, 'Триллер');
+SELECT 4, 'Триллер'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(5, 'Документальный');
+SELECT 5, 'Документальный'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
 INSERT INTO PUBLIC.GENRES
-(GENRE_ID, NAME)
-VALUES(6, 'Боевик');
-
+SELECT 6, 'Боевик'
+where not exists(select * from PUBLIC.GENRES  where GENRE_ID = 1)
+;
