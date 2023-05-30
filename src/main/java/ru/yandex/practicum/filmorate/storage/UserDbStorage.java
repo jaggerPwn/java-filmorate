@@ -73,13 +73,8 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "update USERS set " +
                 "USER_ID = ?, EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? " +
                 "where USER_ID = ?";
-        int update = jdbcTemplate.update(sqlQuery
-                , user.getId()
-                , user.getEmail()
-                , user.getLogin()
-                , user.getName()
-                , user.getBirthday()
-                , user.getId());
+        int update = jdbcTemplate.update(sqlQuery, user.getId(), user.getEmail(), user.getLogin(),
+                user.getName(), user.getBirthday(), user.getId());
         if (update < 1) throw new ValidationException404("user" + user.getId() + " not found");
         return user;
     }
