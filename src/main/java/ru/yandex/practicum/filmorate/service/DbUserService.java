@@ -25,8 +25,7 @@ public class DbUserService implements UserService {
 
 
     @Autowired
-    public DbUserService(@Qualifier("userDbStorage") UserStorage userStorage
-            , JdbcTemplate jdbcTemplate) {
+    public DbUserService(@Qualifier("userDbStorage") UserStorage userStorage, JdbcTemplate jdbcTemplate) {
         this.userStorage = userStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
