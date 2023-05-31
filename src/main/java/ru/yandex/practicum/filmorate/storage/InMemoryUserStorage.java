@@ -35,7 +35,6 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    @Override
     public void setId(int id) {
         this.id = id;
     }

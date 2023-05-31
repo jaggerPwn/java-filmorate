@@ -9,8 +9,6 @@ public interface UserStorage {
 
     User create(User user);
 
-    void setId(int id);
-
     User update(User user);
 
     User getUserById(int id);

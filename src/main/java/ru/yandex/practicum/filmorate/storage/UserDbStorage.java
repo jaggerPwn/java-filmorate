@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,7 +22,6 @@ import java.util.Collection;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -55,13 +54,13 @@ public class UserDbStorage implements UserStorage {
             statement.setDate(4, Date.valueOf(user.getBirthday()));
             return statement;
         }, keyHolder);
-        user.setId(keyHolder.getKey().intValue());
+        try {
+            user.setId(keyHolder.getKey().intValue());
+        } catch (InvalidDataAccessApiUsageException | NullPointerException e) {
+            e.printStackTrace();
+            throw new ValidationException500("key not assigned");
+        }
         return user;
-    }
-
-    @Override
-    public void setId(int id) {
-
     }
 
     @Override

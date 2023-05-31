@@ -120,7 +120,6 @@ public class InMemoryUserService implements UserService {
     @Override
     public Collection<User> deleteAll() {
         userStorage.clear();
-        userStorage.setId(0);
         return userStorage.findAll();
     }
 }

@@ -75,7 +75,6 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Collection<Film> deleteAll() {
         filmStorage.findAll().clear();
-        filmStorage.setId(0);
         return filmStorage.findAll();
     }
 
