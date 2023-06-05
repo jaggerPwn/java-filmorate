@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -9,13 +10,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 
 @Data
-
+@Builder
 public class User {
     private int id;
     @Email(regexp = ".+@.+\\..+|")
@@ -27,7 +26,7 @@ public class User {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    Set<Integer> friends = new TreeSet<>((o1, o2) -> {
+    TreeMap<Integer/*friendId*/, Integer/*status, 1 accepted, 0 unaccepted*/> friends = new TreeMap<>((o1, o2) -> {
         if (o1 > o2) return 1;
         else if (o2 > o1) return -1;
         return 0;

@@ -1,2 +1,3 @@
 # java-filmorate
-Template repository for Filmorate project.
+Diagram for sql:
+![](src/main/resources/ERdiagram.jpg)

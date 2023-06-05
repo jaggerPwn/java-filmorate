@@ -12,6 +12,7 @@ import java.util.*;
 @RestController
 @Slf4j
 @RequestMapping("/users")
+
 public class UserController {
     private final UserService userService;
 
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> getUserFriends(@PathVariable("id") int userId) {
+    public Collection<User> getUserFriends(@PathVariable("id") int userId) {
         return userService.getUserFriends(userId);
     }
 
@@ -46,7 +47,7 @@ public class UserController {
 
     @PutMapping
     public User put(@RequestBody User user) {
-        return userService.getUserStorage().put(user);
+        return userService.getUserStorage().update(user);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
@@ -60,7 +61,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public Map<Integer, User> deleteAll() {
+    public Collection<User> deleteAll() {
         return userService.deleteAll();
     }
 }

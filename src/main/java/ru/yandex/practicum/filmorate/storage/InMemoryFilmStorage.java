@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
@@ -18,7 +20,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private int id = 0;
 
-    public InMemoryFilmStorage(UserStorage userStorage) {
+    @Autowired
+    public InMemoryFilmStorage(
+            //TODO заменить на inMemoryUserStorage
+            @Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -27,7 +32,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
-    @Override
     public void setId(int id) {
         this.id = id;
     }
@@ -35,7 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (filmDateIsBefore(film)) {
-            throw new ValidationException400("дата релиза должна быть не раньше 28 декабря 1895 года");
+            throw new ValidationException400("release date must be no earlier than December 28, 1895");
         }
         film.setId(++id);
         films.put(film.getId(), film);
@@ -44,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public Film put(Film film) {
+    public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
             throw new ValidationException500("No such film id: " + film.getId());
         }
@@ -54,8 +58,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(int filmId) {
-        if (films.get(filmId) == null) throw new ValidationException404("Фильм " + filmId + "не найден");
+        if (films.get(filmId) == null) throw new ValidationException404("Movie " + filmId + " not found");
         return films.get(filmId);
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     private boolean filmDateIsBefore(Film film) {

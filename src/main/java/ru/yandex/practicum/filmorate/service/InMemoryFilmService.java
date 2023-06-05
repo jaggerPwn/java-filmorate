@@ -1,23 +1,29 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class InMemoryFilmService implements FilmService {
     private final FilmStorage filmStorage;
-    private final UserService userService;
+    private final UserStorage userStorage;
 
-    public InMemoryFilmService(FilmStorage filmStorage, UserService userService) {
+    @Autowired
+    public InMemoryFilmService(FilmStorage filmStorage,
+                               @Qualifier("inMemoryUserStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
-        this.userService = userService;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -26,30 +32,29 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer count) {
+    public Collection<Film> getPopularFilms(Integer count) {
         if (count < 1)
             throw new ValidationException400("Запрошено количество популярных фильмов меньше одного: " + count);
-        Collection<Film> all = filmStorage.findAll();
-        ArrayList<Film> all2 = new ArrayList<>(all);
+        Collection<User> all = userStorage.findAll();
+        Map<Film, Integer> allFilmLikes = new HashMap<>();
 
-        return all2.stream()
-                .sorted((film1, film2) -> {
-                    int film1Int = film1.getLikes();
-                    int film2Int = film2.getLikes();
-                    return Integer.compare(film2Int, film1Int);
-                })
-                .limit(count)
-                .collect(Collectors.toList());
+        for (User user : all) {
+            for (Film film : user.getFilmLikes()) {
+                if (!allFilmLikes.containsKey(film)) allFilmLikes.put(film, 1);
+                else allFilmLikes.put(film, allFilmLikes.get(film) + 1);
+            }
+        }
+        Collection<Film> films = allFilmLikes.keySet();
+        return films;
     }
 
     @Override
     public Film addLike(int filmId, int userId) {
-        User user = userService.getUserStorage().getUserById(userId);
+        User user = userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(filmId);
         if (user.getFilmLikes().contains(film))
             throw new ValidationException404("Пользователь " + userId + " уже лайкал фильм " + filmId);
         else {
-            film.setLikes(film.getLikes() + 1);
             user.getFilmLikes().add(film);
         }
         return film;
@@ -57,12 +62,11 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film deleteLike(int filmId, int userId) {
-        User user = userService.getUserStorage().getUserById(userId);
+        User user = userStorage.getUserById(userId);
         Film film = filmStorage.getFilmById(filmId);
         if (!user.getFilmLikes().contains(film))
             throw new ValidationException404("Пользователь " + userId + " не лайкал фильм " + filmId);
         else {
-            film.setLikes(film.getLikes() - 1);
             user.getFilmLikes().remove(film);
         }
         return film;
@@ -71,7 +75,26 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Collection<Film> deleteAll() {
         filmStorage.findAll().clear();
-        filmStorage.setId(0);
         return filmStorage.findAll();
+    }
+
+    @Override
+    public Mpa getMpa(Integer mpaID) {
+        return null;
+    }
+
+    @Override
+    public Collection<Mpa> getMpa() {
+        return null;
+    }
+
+    @Override
+    public Genres getGenres(Integer genresId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Genres> getGenres() {
+        return null;
     }
 }
