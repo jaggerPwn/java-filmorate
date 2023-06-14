@@ -28,4 +28,6 @@ public class Film {
     private Collection<Genres> genres;
     @Nullable
     private Mpa mpa;
+    @Nullable
+    private Collection<Director> directors;
 }

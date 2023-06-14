@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -95,7 +96,7 @@ public class FilmDbStorage implements FilmStorage {
         if (update < 1) {
             throw new ValidationException404("film not found");
         }
-        updateUpMpaAndGeneres(film);
+        updateMpaAndGeneres(film);
         return this.getFilmById(film.getId());
     }
 
@@ -115,14 +116,14 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException404("film not found");
         }
         if (film != null) {
-            selectMpaNGenre(filmId, film);
+            selectMpaGenreDirector(filmId, film);
         } else {
             throw new ValidationException404("film not found, id " + filmId);
         }
         return film;
     }
 
-    private void selectMpaNGenre(int filmId, Film film) {
+    private void selectMpaGenreDirector(int filmId, Film film) {
         String sqlQueryForGenre = "SELECT gf.GENRE_ID, g.NAME \n" +
                 "FROM GENRES_FILM gf  \n" +
                 "LEFT JOIN GENRES g  ON gf.GENRE_ID = g.GENRE_ID\n" +
@@ -143,43 +144,19 @@ public class FilmDbStorage implements FilmStorage {
             film.setMpa(query.get(0));
         } catch (DataAccessException | IndexOutOfBoundsException ignored) {
         }
-    }
-
-    private static Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return Mpa.builder()
-                .id(resultSet.getInt("MPA_ID"))
-                .name(resultSet.getString("NAME"))
-                .build();
-    }
-
-    @Override
-    public void clear() {
-        jdbcTemplate.update("DELETE FROM GENRES_FILM");
-        jdbcTemplate.update("DELETE FROM MPA_FILM");
-        jdbcTemplate.update("DELETE FROM FILMS");
-    }
-
-
-    public static Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        ArrayList<Genres> genres = new ArrayList<>();
-        Film film = Film.builder()
-                .id(resultSet.getInt("FILM_ID"))
-                .name(resultSet.getString("NAME"))
-                .description(resultSet.getString("DESCRIPTION"))
-                .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
-                .duration(resultSet.getInt("DURATION"))
-                .genres(genres)
-                .build();
+        String sqlQueryForDirectors = "SELECT d.DIRECTOR_ID, d.NAME\n" +
+                "FROM PUBLIC.DIRECTORS d\n" +
+                "JOIN PUBLIC.DIRECTORS_FILM df ON df.DIRECTOR_ID = d.DIRECTOR_ID \n" +
+                "JOIN PUBLIC.FILMS f ON f.FILM_ID = df.FILM_ID \n" +
+                "WHERE f.FILM_ID = ?";
+        Collection<Director> directorsCollection;
         try {
-            int mpaId = resultSet.getInt("MPA_ID");
-            Mpa mpa = Mpa.builder().id(mpaId).build();
-            film.setMpa(mpa);
-        } catch (SQLException ignored) {
+            directorsCollection = jdbcTemplate.query(sqlQueryForDirectors, FilmDbStorage::mapRowToDirectors, filmId);
+            film.setDirectors(directorsCollection);
+        } catch (DataAccessException | IndexOutOfBoundsException ignored) {
         }
-
-
-        return film;
     }
+
 
     private void setUpMpaAndGeneres(Film film) {
         String sqlForGenre = "INSERT INTO GENRES_FILM (GENRE_ID, FILM_ID) VALUES ( ?, ?)";
@@ -200,8 +177,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-
-    private void updateUpMpaAndGeneres(Film film) {
+    private void updateMpaAndGeneres(Film film) {
         String sqlQueryForGenres;
         try {
 
@@ -234,11 +210,53 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
+    public static Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        ArrayList<Genres> genres = new ArrayList<>();
+        Film film = Film.builder()
+                .id(resultSet.getInt("FILM_ID"))
+                .name(resultSet.getString("NAME"))
+                .description(resultSet.getString("DESCRIPTION"))
+                .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
+                .duration(resultSet.getInt("DURATION"))
+                .genres(genres)
+                .build();
+        try {
+            int mpaId = resultSet.getInt("MPA_ID");
+            Mpa mpa = Mpa.builder().id(mpaId).build();
+            film.setMpa(mpa);
+        } catch (SQLException ignored) {
+        }
+
+
+        return film;
+    }
+
+    private static Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+        return Mpa.builder()
+                .id(resultSet.getInt("MPA_ID"))
+                .name(resultSet.getString("NAME"))
+                .build();
+    }
+
     public static Genres mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return Genres.builder()
                 .id(resultSet.getInt("GENRE_ID"))
                 .name(resultSet.getString("NAME"))
                 .build();
+    }
+
+    private static Director mapRowToDirectors(ResultSet resultSet, int rowNum) throws SQLException {
+        return Director.builder()
+                .id(resultSet.getInt("DIRECTOR_ID"))
+                .name("NAME")
+                .build();
+    }
+
+    @Override
+    public void clear() {
+        jdbcTemplate.update("DELETE FROM GENRES_FILM");
+        jdbcTemplate.update("DELETE FROM MPA_FILM");
+        jdbcTemplate.update("DELETE FROM FILMS");
     }
 
     private boolean filmDateIsBefore(Film film) {
