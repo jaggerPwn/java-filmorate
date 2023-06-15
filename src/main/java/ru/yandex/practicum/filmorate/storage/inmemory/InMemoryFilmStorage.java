@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.InMemory;
+package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorage implements Storage<Film> {
     private final Map<Integer, Film> films = new HashMap<>();
     private int id = 0;
 
     @Autowired
     public InMemoryFilmStorage(
-            @Qualifier("dbUserStorage") UserStorage userStorage) {
+            @Qualifier("dbUserStorage") Storage<User> userStorage) {
     }
 
     @Override
@@ -56,7 +56,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(int filmId) {
+    public Film getById(int filmId) {
         if (films.get(filmId) == null) throw new ValidationException404("Movie " + filmId + " not found");
         return films.get(filmId);
     }

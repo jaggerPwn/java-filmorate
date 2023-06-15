@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.Db;
+package ru.yandex.practicum.filmorate.storage.db;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @Repository
-public class DbUserStorage implements UserStorage {
+public class DbUserStorage implements Storage<User> {
     private final JdbcTemplate jdbcTemplate;
 
     public DbUserStorage(JdbcTemplate jdbcTemplate) {
@@ -80,7 +80,7 @@ public class DbUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(int userId) {
+    public User getById(int userId) {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS where USER_ID =  ?";
         User user;
         try {

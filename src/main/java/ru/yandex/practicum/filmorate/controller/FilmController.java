@@ -26,7 +26,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film findFilm(@PathVariable("id") int id) {
-        return filmService.getFilmStorage().getFilmById(id);
+        return filmService.getFilmStorage().getById(id);
     }
 
     @GetMapping("/popular")

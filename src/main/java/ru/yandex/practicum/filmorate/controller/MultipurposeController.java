@@ -14,10 +14,10 @@ import java.util.Collection;
 @RestController
 @Slf4j
 @RequestMapping
-public class OtherController {
+public class MultipurposeController {
     private final FilmService filmService;
 
-    public OtherController(FilmService filmService) {
+    public MultipurposeController(FilmService filmService) {
         this.filmService = filmService;
     }
 

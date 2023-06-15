@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.InMemory;
+package ru.yandex.practicum.filmorate.service.inmemory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,25 +10,24 @@ import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.*;
 
 @Service
 public class InMemoryFilmService implements FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final Storage<Film> filmStorage;
+    private final Storage<User> userStorage;
 
     @Autowired
-    public InMemoryFilmService(FilmStorage filmStorage,
-                               @Qualifier("inMemoryUserStorage") UserStorage userStorage) {
+    public InMemoryFilmService(Storage<Film> filmStorage,
+                               @Qualifier("inMemoryUserStorage") Storage<User> userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
     @Override
-    public FilmStorage getFilmStorage() {
+    public Storage<Film> getFilmStorage() {
         return filmStorage;
     }
 
@@ -50,8 +49,8 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film addLike(int filmId, int userId) {
-        User user = userStorage.getUserById(userId);
-        Film film = filmStorage.getFilmById(filmId);
+        User user = userStorage.getById(userId);
+        Film film = filmStorage.getById(filmId);
         if (user.getFilmLikes().contains(film))
             throw new ValidationException404("Пользователь " + userId + " уже лайкал фильм " + filmId);
         else {
@@ -62,8 +61,8 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film deleteLike(int filmId, int userId) {
-        User user = userStorage.getUserById(userId);
-        Film film = filmStorage.getFilmById(filmId);
+        User user = userStorage.getById(userId);
+        Film film = filmStorage.getById(filmId);
         if (!user.getFilmLikes().contains(film))
             throw new ValidationException404("Пользователь " + userId + " не лайкал фильм " + filmId);
         else {

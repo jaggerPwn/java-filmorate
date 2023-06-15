@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.Db;
+package ru.yandex.practicum.filmorate.storage.db;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Primary
-public class DbFilmStorage implements FilmStorage {
+public class DbFilmStorage implements Storage<Film> {
     private final JdbcTemplate jdbcTemplate;
 
     public DbFilmStorage(JdbcTemplate jdbcTemplate) {
@@ -41,7 +41,7 @@ public class DbFilmStorage implements FilmStorage {
         String sqlQuery = "SELECT FILM_ID FROM FILMS";
         List<Integer> filmId = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> resultSet.getInt("FILM_ID"));
         for (Integer id : filmId) {
-            query.add(this.getFilmById(id));
+            query.add(this.getById(id));
         }
         return query;
     }
@@ -79,7 +79,7 @@ public class DbFilmStorage implements FilmStorage {
 
         film.setId(id);
         setUpMpaAndGeneres(film);
-        return getFilmById(id);
+        return getById(id);
     }
 
     @Override
@@ -98,12 +98,12 @@ public class DbFilmStorage implements FilmStorage {
             throw new ValidationException404("film not found");
         }
         updateMpaAndGeneres(film);
-        return this.getFilmById(film.getId());
+        return this.getById(film.getId());
     }
 
 
     @Override
-    public Film getFilmById(int filmId) {
+    public Film getById(int filmId) {
         String sqlQuery = "select FILM_ID," +
                 "NAME, " +
                 "DESCRIPTION, " +

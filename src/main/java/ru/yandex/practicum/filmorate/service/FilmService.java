@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.Collection;
 
 public interface FilmService {
-    FilmStorage getFilmStorage();
+    Storage<Film> getFilmStorage();
 
     Collection<Film> getPopularFilms(Integer count);
 

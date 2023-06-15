@@ -1,7 +1,6 @@
-package ru.yandex.practicum.filmorate.service.Db;
+package ru.yandex.practicum.filmorate.service.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,9 +11,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.Db.DbFilmStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.DbFilmStorage;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,18 +23,17 @@ import java.util.Collection;
 @Primary
 public class DbFilmService implements FilmService {
 
-    private final FilmStorage filmStorage;
+    private final Storage<Film> filmStorage;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DbFilmService(FilmStorage filmStorage,
-                         JdbcTemplate jdbcTemplate) {
-        this.filmStorage = filmStorage;
+    public DbFilmService(Storage<Film> storage, JdbcTemplate jdbcTemplate) {
+        this.filmStorage = storage;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public FilmStorage getFilmStorage() {
+    public Storage<Film> getFilmStorage() {
         return filmStorage;
     }
 
@@ -82,7 +79,7 @@ public class DbFilmService implements FilmService {
 
         sqlQuery = "INSERT INTO FILMLIKES (FILM_ID, USER_ID)  VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, userId);
-        return filmStorage.getFilmById(filmId);
+        return filmStorage.getById(filmId);
     }
 
     @Override
@@ -91,7 +88,7 @@ public class DbFilmService implements FilmService {
         int update = jdbcTemplate.update(sqlQuery, filmId, userId);
         if (update != 1) throw new ValidationException404(String.format("Like not found in pair USER %d," +
                 " FILM %d", userId, filmId));
-        return filmStorage.getFilmById(filmId);
+        return filmStorage.getById(filmId);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public User getById(@PathVariable("userId") int userId) {
-        return userService.getUserStorage().getUserById(userId);
+        return userService.getUserStorage().getById(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
