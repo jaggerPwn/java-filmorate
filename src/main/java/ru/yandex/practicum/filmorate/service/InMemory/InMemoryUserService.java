@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.InMemory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.text.MessageFormat;
@@ -17,12 +18,12 @@ public class InMemoryUserService implements UserService {
     UserStorage userStorage;
 
     @Autowired
-    public InMemoryUserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public InMemoryUserService(@Qualifier("dbUserStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     @Override
-    public Map<String, String> addFriend(int userId, int friendId) {
+    public void addFriend(int userId, int friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null) {
@@ -59,13 +60,11 @@ public class InMemoryUserService implements UserService {
                 friend.getFriends().get(userId) == 0) {
             friend.getFriends().put(userId, 1);
             user.getFriends().put(friendId, 1);
-            return Map.of("Success", String.format("Now friends %d : %d", userId, friendId));
         } else user.getFriends().put(friendId, 0);
-        return Map.of("Success", String.format("Friend invitation sent from %d to %d", userId, friendId));
     }
 
     @Override
-    public Map<String, String> deleteFriend(int userId, int friendId) {
+    public void deleteFriend(int userId, int friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user == null) {
@@ -80,21 +79,14 @@ public class InMemoryUserService implements UserService {
                     user.getName(), friend.getName()));
         else {
             user.getFriends().remove(friendId);
-            if (friend.getFriends().containsKey(userId))
-                friend.getFriends().remove(userId);
-            return Map.of("Success", "Not friends anymore " + userId + " : " + friendId);
+            friend.getFriends().remove(userId);
         }
 
     }
 
     @Override
-    public UserStorage getUserStorage() {
-        return userStorage;
-    }
-
-    @Override
     public Collection<User> getUserFriends(int userId) {
-        TreeMap<Integer, Integer> friends = getUserStorage().getUserById(userId).getFriends();
+        TreeMap<Integer, Integer> friends = userStorage.getUserById(userId).getFriends();
         Set<User> userFriends = new TreeSet<>((o1, o2) -> {
             if (o1.getId() > o2.getId()) return 1;
             else if (o2.getId() > o1.getId()) return -1;
@@ -103,7 +95,7 @@ public class InMemoryUserService implements UserService {
         for (Map.Entry<Integer, Integer> entry : friends.entrySet()) {
             Integer key = entry.getKey();
             Integer value = entry.getValue();
-            if (value == 1) userFriends.add(getUserStorage().getUserById(key));
+            if (value == 1) userFriends.add(userStorage.getUserById(key));
         }
         return userFriends;
     }
@@ -121,5 +113,10 @@ public class InMemoryUserService implements UserService {
     public Collection<User> deleteAll() {
         userStorage.clear();
         return userStorage.findAll();
+    }
+
+    @Override
+    public UserStorage getUserStorage() {
+        return userStorage;
     }
 }

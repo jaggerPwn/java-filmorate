@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.Db;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,7 +11,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.Db.DbFilmStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -22,17 +23,15 @@ import java.util.Collection;
 
 @Service
 @Primary
-public class DbFilmServiceImpl implements FilmService {
+public class DbFilmService implements FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DbFilmServiceImpl(FilmStorage filmStorage,
-                             @Qualifier("userDbStorage") UserStorage userStorage, JdbcTemplate jdbcTemplate) {
+    public DbFilmService(FilmStorage filmStorage,
+                         JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -66,7 +65,7 @@ public class DbFilmServiceImpl implements FilmService {
                 "                             m.MPA_ID\n" +
                 "                             ORDER BY FILM_LIKES DESC\n" +
                 "                            LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::mapRowToFilm, count);
+        return jdbcTemplate.query(sqlQuery, DbFilmStorage::mapRowToFilm, count);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class DbFilmServiceImpl implements FilmService {
         String sqlQuery = "SELECT FILM_ID, USER_ID FROM FILMLIKES f WHERE FILM_ID = ? AND USER_ID = ?;";
         Boolean hasLike;
         try {
-            hasLike = jdbcTemplate.queryForObject(sqlQuery, DbFilmServiceImpl::mapGetFilmlike, filmId, userId);
+            hasLike = jdbcTemplate.queryForObject(sqlQuery, DbFilmService::mapGetFilmlike, filmId, userId);
             if (Boolean.TRUE.equals(hasLike)) {
                 throw new ValidationException404("USER " + userId + " already added like to film " + filmId);
             }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.Db;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -19,10 +20,10 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @Repository
-public class UserDbStorage implements UserStorage {
+public class DbUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbUserStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -30,7 +31,7 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> findAll() {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS";
 
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser);
+        return jdbcTemplate.query(sqlQuery, DbUserStorage::mapRowToUser);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY from USERS where USER_ID =  ?";
         User user;
         try {
-            user = jdbcTemplate.queryForObject(sqlQuery, UserDbStorage::mapRowToUser, userId);
+            user = jdbcTemplate.queryForObject(sqlQuery, DbUserStorage::mapRowToUser, userId);
         } catch (DataAccessException e) {
             throw new ValidationException404("user " + userId + " not found");
         }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.Db;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -27,10 +28,10 @@ import java.util.stream.Collectors;
 
 @Repository
 @Primary
-public class FilmDbStorage implements FilmStorage {
+public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    public DbFilmStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -111,7 +112,7 @@ public class FilmDbStorage implements FilmStorage {
                 "from FILMS where FILM_ID =  ?";
         Film film;
         try {
-            film = jdbcTemplate.queryForObject(sqlQuery, FilmDbStorage::mapRowToFilm, filmId);
+            film = jdbcTemplate.queryForObject(sqlQuery, DbFilmStorage::mapRowToFilm, filmId);
         } catch (DataAccessException e) {
             throw new ValidationException404("film not found");
         }
@@ -130,7 +131,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE gf.FILM_ID = ?";
         Collection<Genres> genresCollection;
         try {
-            genresCollection = jdbcTemplate.query(sqlQueryForGenre, FilmDbStorage::mapRowToGenre, filmId);
+            genresCollection = jdbcTemplate.query(sqlQueryForGenre, DbFilmStorage::mapRowToGenre, filmId);
             film.setGenres(genresCollection);
         } catch (DataAccessException ignored) {
         }
@@ -140,7 +141,7 @@ public class FilmDbStorage implements FilmStorage {
                 "        LEFT JOIN FILMS f ON f.FILM_ID = mf.FILM_ID \n" +
                 "        WHERE mf.FILM_ID = ?";
         try {
-            List<Mpa> query = jdbcTemplate.query(sqlQueryForMPA, FilmDbStorage::mapRowToMpa, filmId);
+            List<Mpa> query = jdbcTemplate.query(sqlQueryForMPA, DbFilmStorage::mapRowToMpa, filmId);
             film.setMpa(query.get(0));
         } catch (DataAccessException | IndexOutOfBoundsException ignored) {
         }
@@ -151,7 +152,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE f.FILM_ID = ?";
         Collection<Director> directorsCollection;
         try {
-            directorsCollection = jdbcTemplate.query(sqlQueryForDirectors, FilmDbStorage::mapRowToDirectors, filmId);
+            directorsCollection = jdbcTemplate.query(sqlQueryForDirectors, DbFilmStorage::mapRowToDirectors, filmId);
             film.setDirectors(directorsCollection);
         } catch (DataAccessException | IndexOutOfBoundsException ignored) {
         }

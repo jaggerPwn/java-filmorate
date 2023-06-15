@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.InMemory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.exception.ValidationException500;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,15 +18,12 @@ import java.util.Map;
 
 @Repository
 public class InMemoryFilmStorage implements FilmStorage {
-    private final UserStorage userStorage;
     private final Map<Integer, Film> films = new HashMap<>();
     private int id = 0;
 
     @Autowired
     public InMemoryFilmStorage(
-            //TODO заменить на inMemoryUserStorage
-            @Qualifier("userDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
+            @Qualifier("dbUserStorage") UserStorage userStorage) {
     }
 
     @Override

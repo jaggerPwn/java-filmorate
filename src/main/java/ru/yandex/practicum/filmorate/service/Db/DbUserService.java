@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.Db;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserDbStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.Db.*;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.*;
 
 @Service
@@ -25,14 +25,14 @@ public class DbUserService implements UserService {
 
 
     @Autowired
-    public DbUserService(@Qualifier("userDbStorage") UserStorage userStorage, JdbcTemplate jdbcTemplate) {
+    public DbUserService(@Qualifier("dbUserStorage") UserStorage userStorage, JdbcTemplate jdbcTemplate) {
         this.userStorage = userStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
 
 
     @Override
-    public Map<String, String> addFriend(int userId, int friendId) {
+    public void addFriend(int userId, int friendId) {
         String sqlQuery1 = "SELECT USER_ID FROM USERS u WHERE USER_ID = ?";
         Integer userIdDB;
         Integer friendIdDB;
@@ -52,9 +52,6 @@ public class DbUserService implements UserService {
         String sqlAddFriend;
         String sqlUpdateToAccepted;
 
-        int friendAcceptanceStatus = -1;
-        int userAcceptanceStatus;
-
         Integer[] userFriendArray = new Integer[3];
         Integer[] friendFriendsArray = new Integer[3];
 
@@ -70,30 +67,21 @@ public class DbUserService implements UserService {
         }
         if (userFriendArray[0] == null && friendFriendsArray[0] == null) {
             sqlAddFriend = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, 1)";  //ЕСЛИ НУЖНА АВТОРИЗАЦИЯ НА ДРУЗЬЯ ПОМЕНЯТЬ ПОСЛЕДНЕЕ ЗНАЧЕНИЕ НА 0
-            userAcceptanceStatus = jdbcTemplate.update(sqlAddFriend, userId, friendId);
-            return Map.of("Success", String.format(MessageFormat.format("invitation sent userAcceptanceStatus = {0}, friendAcceptanceStatus = {1}", userAcceptanceStatus, friendAcceptanceStatus)));
+            jdbcTemplate.update(sqlAddFriend, userId, friendId);
         } else if (userFriendArray[0] != null) {
             throw new ValidationException400(userId + " already sent invitation to " + friendId);
         } else {
             if (friendFriendsArray[2] == 1)
                 throw new ValidationException400(userId + " already friends with " + friendId);
             sqlUpdateToAccepted = "UPDATE FRIENDS f SET STATUS = 1 WHERE f.USER_ID IN (?) AND f.FRIEND_ID IN (?) AND STATUS IN (0)";
-            friendAcceptanceStatus = jdbcTemplate.update(sqlUpdateToAccepted, friendId, userId);
-            userAcceptanceStatus = 1;
-            return Map.of("Success", String.format(MessageFormat.format("now friends userAcceptanceStatus = {0}, friendAcceptanceStatus = {1}", userAcceptanceStatus, friendAcceptanceStatus)));
+            jdbcTemplate.update(sqlUpdateToAccepted, friendId, userId);
         }
     }
 
     @Override
-    public Map<String, String> deleteFriend(int userId, int friendId) {
+    public void deleteFriend(int userId, int friendId) {
         String sqlQuery = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sqlQuery, userId, friendId);
-        return null;
-    }
-
-    @Override
-    public UserStorage getUserStorage() {
-        return userStorage;
     }
 
     @Override
@@ -102,8 +90,7 @@ public class DbUserService implements UserService {
                 "FROM USERS u \n" +
                 "LEFT JOIN FRIENDS f ON f.FRIEND_ID = u.USER_ID \n" +
                 "WHERE f.USER_ID = ? AND f.STATUS = 1";
-        List<User> friendList = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, userId);
-        return friendList;
+        return jdbcTemplate.query(sqlQuery, DbUserStorage::mapRowToUser, userId);
     }
 
     @Override
@@ -112,8 +99,8 @@ public class DbUserService implements UserService {
                 "FROM USERS u \n" +
                 "LEFT JOIN FRIENDS f ON f.FRIEND_ID = u.USER_ID \n" +
                 "WHERE f.USER_ID = ? AND f.STATUS = 1";
-        List<User> friendList1 = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, userId);
-        List<User> friendList2 = jdbcTemplate.query(sqlQuery, UserDbStorage::mapRowToUser, friendId);
+        List<User> friendList1 = jdbcTemplate.query(sqlQuery, DbUserStorage::mapRowToUser, userId);
+        List<User> friendList2 = jdbcTemplate.query(sqlQuery, DbUserStorage::mapRowToUser, friendId);
         Set<User> intersection = new HashSet<>(friendList1);
         intersection.retainAll(friendList2);
         return intersection;
@@ -130,6 +117,11 @@ public class DbUserService implements UserService {
         sqlQuery = "ALTER TABLE  USERS  ALTER COLUMN USER_ID  RESTART WITH 1";
         jdbcTemplate.update(sqlQuery);
         return userStorage.findAll();
+    }
+
+    @Override
+    public UserStorage getUserStorage() {
+        return userStorage;
     }
 
     private Integer[] mapRowToSimpleArray(ResultSet resultSet, int i) {
