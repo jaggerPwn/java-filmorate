@@ -9,7 +9,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException400;
 import ru.yandex.practicum.filmorate.exception.ValidationException404;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -117,14 +116,14 @@ public class DbFilmStorage implements Storage<Film> {
             throw new ValidationException404("film not found");
         }
         if (film != null) {
-            selectMpaGenreDirector(filmId, film);
+            selectMpaGenre(filmId, film);
         } else {
             throw new ValidationException404("film not found, id " + filmId);
         }
         return film;
     }
 
-    private void selectMpaGenreDirector(int filmId, Film film) {
+    private void selectMpaGenre(int filmId, Film film) {
         String sqlQueryForGenre = "SELECT gf.GENRE_ID, g.NAME \n" +
                 "FROM GENRES_FILM gf  \n" +
                 "LEFT JOIN GENRES g  ON gf.GENRE_ID = g.GENRE_ID\n" +
@@ -150,12 +149,6 @@ public class DbFilmStorage implements Storage<Film> {
                 "JOIN PUBLIC.DIRECTORS_FILM df ON df.DIRECTOR_ID = d.DIRECTOR_ID \n" +
                 "JOIN PUBLIC.FILMS f ON f.FILM_ID = df.FILM_ID \n" +
                 "WHERE f.FILM_ID = ?";
-        Collection<Director> directorsCollection;
-        try {
-            directorsCollection = jdbcTemplate.query(sqlQueryForDirectors, DbFilmStorage::mapRowToDirectors, filmId);
-            film.setDirectors(directorsCollection);
-        } catch (DataAccessException | IndexOutOfBoundsException ignored) {
-        }
     }
 
 
@@ -243,13 +236,6 @@ public class DbFilmStorage implements Storage<Film> {
         return Genres.builder()
                 .id(resultSet.getInt("GENRE_ID"))
                 .name(resultSet.getString("NAME"))
-                .build();
-    }
-
-    private static Director mapRowToDirectors(ResultSet resultSet, int rowNum) throws SQLException {
-        return Director.builder()
-                .id(resultSet.getInt("DIRECTOR_ID"))
-                .name("NAME")
                 .build();
     }
 

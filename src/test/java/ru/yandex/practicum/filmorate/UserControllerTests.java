@@ -4,15 +4,13 @@ package ru.yandex.practicum.filmorate;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,7 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 
 public class UserControllerTests {
@@ -28,16 +25,15 @@ public class UserControllerTests {
     @Autowired
     private WebApplicationContext wac;
 
-    @Before
-    public void setupMockMvc() throws Exception {
+    @BeforeEach
+    public void setup() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
 
     @AfterEach
-    public void setup() throws Exception {
-
+    public void tear() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
@@ -65,7 +61,7 @@ public class UserControllerTests {
         JsonElement jsonElement = JsonParser.parseString(contentAsString);
         JsonObject object = jsonElement.getAsJsonObject();
         String login = object.get("login").getAsString();
-        Assert.assertEquals(login, "dolore");
+        Assertions.assertEquals(login, "dolore");
     }
 
     @Test
@@ -145,7 +141,7 @@ public class UserControllerTests {
         JsonElement jsonElement = JsonParser.parseString(contentAsString);
         JsonObject object = jsonElement.getAsJsonObject();
         String login = object.get("name").getAsString();
-        Assert.assertEquals(login, "common");
+        Assertions.assertEquals(login, "common");
     }
 
 }

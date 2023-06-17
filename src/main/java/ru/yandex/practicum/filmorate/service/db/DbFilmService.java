@@ -42,26 +42,23 @@ public class DbFilmService implements FilmService {
         if (count < 1)
             throw new ValidationException400("Запрошено количество популярных фильмов меньше одного: " + count);
 
-        String sqlQuery = "SELECT             f.FILM_ID, \n" +
-                "                             f.NAME, \n" +
-                "                             f.DESCRIPTION, \n" +
-                "                             f.RELEASE_DATE, \n" +
-                "                             f.DURATION,\n" +
-                "                             COUNT (fl.FILM_ID) AS FILM_LIKES,\n" +
-                "                             m.MPA_ID   \n" +
-                "                             FROM FILMS f \n" +
-                "                   LEFT JOIN FILMLIKES fl ON fl.FILM_ID = f.FILM_ID\n" +
-                "                   LEFT JOIN MPA_FILM mf ON mf.FILM_ID  = f.FILM_ID \n" +
-                "                   LEFT JOIN MPA m ON m.MPA_ID  = mf.MPA_ID \n" +
-                "                   GROUP BY f.FILM_ID, \n" +
-                "                              f.NAME, \n" +
-                "                             f.DESCRIPTION, \n" +
-                "                             f.RELEASE_DATE,\n" +
-                "                             FL.USER_ID,\n" +
-                "                             f.DURATION,\n" +
-                "                             m.MPA_ID\n" +
-                "                             ORDER BY FILM_LIKES DESC\n" +
-                "                            LIMIT ?";
+        String sqlQuery = "SELECT             \n" +
+                "    f.FILM_ID, \n" +
+                "    f.NAME,\n" +
+                "    f.DESCRIPTION,\n" +
+                "    f.RELEASE_DATE,\n" +
+                "    f.DURATION,\n" +
+                "    COUNT (fl.FILM_ID) AS FILM_LIKES,\n" +
+                "    m.MPA_ID   \n" +
+                "FROM FILMS f \n" +
+                "LEFT JOIN FILMLIKES fl ON fl.FILM_ID = f.FILM_ID\n" +
+                "LEFT JOIN MPA_FILM mf ON mf.FILM_ID  = f.FILM_ID \n" +
+                "LEFT JOIN MPA m ON m.MPA_ID  = mf.MPA_ID \n" +
+                "GROUP BY  \n" +
+                "\tf.FILM_ID\n" +
+                "HAVING FILM_LIKES > 0\n" +
+                "ORDER BY FILM_LIKES DESC\n" +
+                "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, DbFilmStorage::mapRowToFilm, count);
     }
 

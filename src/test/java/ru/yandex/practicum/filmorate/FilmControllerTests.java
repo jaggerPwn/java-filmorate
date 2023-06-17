@@ -5,15 +5,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,24 +22,21 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashMap;
 
-
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class FilmControllerTests {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext wac;
 
-    @Before
-    public void setupMockMvc() throws Exception {
+    @BeforeEach
+    public void setup() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
 
     @AfterEach
-    public void setup() throws Exception {
-
+    public void tear() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/users"));
         mockMvc.perform(MockMvcRequestBuilders.delete("/films"));
     }
@@ -70,7 +65,7 @@ public class FilmControllerTests {
         JsonElement jsonElement = JsonParser.parseString(contentAsString);
         JsonObject object = jsonElement.getAsJsonObject();
         String login = object.get("name").getAsString();
-        Assert.assertEquals(login, "nisi eiusmod");
+        Assertions.assertEquals(login, "nisi eiusmod");
     }
 
     @Test
@@ -104,7 +99,7 @@ public class FilmControllerTests {
             user.setName(element.getAsJsonObject().get("name").getAsString());
             users.put(id, user);
         }
-        Assert.assertEquals(users.get(1).getName(), "Film Updated");
+        Assertions.assertEquals(users.get(1).getName(), "Film Updated");
 
     }
 
