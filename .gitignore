@@ -13,6 +13,7 @@ target/
 .springBeans
 .sts4-cache
 *.db
+data-local.sql
 
 ### IntelliJ IDEA ###
 .idea

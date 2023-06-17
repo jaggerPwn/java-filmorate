@@ -56,7 +56,7 @@ public class DbFilmService implements FilmService {
                 "LEFT JOIN MPA m ON m.MPA_ID  = mf.MPA_ID \n" +
                 "GROUP BY  \n" +
                 "\tf.FILM_ID\n" +
-                "HAVING FILM_LIKES > 0\n" +
+                //"HAVING FILM_LIKES > 0\n" +
                 "ORDER BY FILM_LIKES DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, DbFilmStorage::mapRowToFilm, count);
