@@ -31,7 +31,9 @@ public class LikeDBStorage {
     }
 
     public void addLike(Long filmId, Long userId) {
-        String query = "INSERT INTO likes (filmid, userid) VALUES  (?,?) ";
+        String query = "DELETE FROM likes WHERE filmId = ? AND userId = ? ";
+        jdbcTemplate.update(query, filmId, userId);
+        query = "INSERT INTO likes (filmid, userid) VALUES(?, ?) ";
         jdbcTemplate.update(query, filmId, userId);
         log.debug("Film с ID {} добавлен Like от User с ID {}", filmId, userId);
     }
