@@ -965,7 +965,7 @@ class FilmorateApplicationTests {
         long filmId = filmDBStorage.saveFilm(film).getId();
         long userId = userDBStorage.saveUser(user).getId();
         reviewService.addReview(ReviewMapper.reviewToDTO(review));
-        review = reviewStorage.getReviewById(1l);
+        review = reviewStorage.getReviewById(1L);
         review.setContent("Фильм не очень");
         review.setIsPositive(false);
         reviewService.updateReview(ReviewMapper.reviewToDTO(review));
