@@ -59,8 +59,9 @@ public class UserController {
     public ResponseEntity<?> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
         userService.deleteFriendById(id, friendId);
         log.info(
-                "Получен DELETE запрос по эндпоинту '/users/{}/friends/{}' на удаление friend c ID {} для user c ID {}."
-                , id, friendId, id, friendId);
+                "Получен DELETE запрос по эндпоинту '/users/{}/friends/{}' " +
+                        "на удаление friend c ID {} для user c ID {}.",
+                id, friendId, id, friendId);
         return new ResponseEntity<>(HttpStatus.valueOf(200));
     }
 
