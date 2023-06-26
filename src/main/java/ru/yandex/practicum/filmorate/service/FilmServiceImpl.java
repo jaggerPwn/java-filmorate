@@ -32,7 +32,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Autowired
     public FilmServiceImpl(@Qualifier("filmDBStorage") FilmStorage fs, @Qualifier("userDBStorage") UserStorage us,
-            LikeDBStorage ls, FeedService feedService) {
+                           LikeDBStorage ls, FeedService feedService) {
         this.fs = fs;
         this.us = us;
         this.ls = ls;

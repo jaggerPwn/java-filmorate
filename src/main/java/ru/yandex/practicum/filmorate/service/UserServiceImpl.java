@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage,
-            FilmDBStorage filmDBStorage, FeedService fs) {
+                           FilmDBStorage filmDBStorage, FeedService fs) {
         this.us = us;
         this.fs = fs;
         this.likeDBStorage = likeDBStorage;

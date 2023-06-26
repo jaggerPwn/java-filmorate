@@ -26,7 +26,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Autowired
     public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDBStorage") FilmDBStorage fs,
-            @Qualifier("userDBStorage") UserDBStorage us) {
+                           @Qualifier("userDBStorage") UserDBStorage us) {
         this.jdbcTemplate = jdbcTemplate;
         this.fs = fs;
         this.us = us;

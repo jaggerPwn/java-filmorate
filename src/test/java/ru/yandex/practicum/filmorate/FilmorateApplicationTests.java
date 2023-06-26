@@ -570,9 +570,10 @@ class FilmorateApplicationTests {
         Assertions.assertArrayEquals(expected, userDBStorage.getAllFriendByUserId(1L).toArray(), "Ожидалось получение " +
                 "всех friend у конкретного User");
     }
+
     @DisplayName("Тест для рекомендаций")
     @Test
-    public void findRecomendationTest(){
+    public void findRecomendationTest() {
         Film film = Film.builder()
                 .id(1L)
                 .name("Film1")
@@ -631,7 +632,7 @@ class FilmorateApplicationTests {
         userDBStorage.saveUser(user2);
         likeDBStorage.addLike(1L, 2L);
         likeDBStorage.addLike(2L, 2L);
-        List<Film> saveRecomendation =userServiceImpl.findRecommendation(2L);
+        List<Film> saveRecomendation = userServiceImpl.findRecommendation(2L);
         Assertions.assertEquals(1, saveRecomendation.size());
         Assertions.assertEquals(3L, saveRecomendation.get(0));
     }

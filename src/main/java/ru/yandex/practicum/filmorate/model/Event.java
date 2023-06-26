@@ -23,7 +23,7 @@ public class Event {
     private Operation operation;
     private long entityId;
 
-    public Map<String, Object> eventToMap(){
+    public Map<String, Object> eventToMap() {
         Map<String, Object> temp = new HashMap<>();
         temp.put("userId", userId);
         temp.put("timestamp", timestamp);

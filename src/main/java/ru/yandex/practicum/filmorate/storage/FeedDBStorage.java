@@ -12,11 +12,13 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 @Component
 @Slf4j
 public class FeedDBStorage implements FeedStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Autowired
     public FeedDBStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -37,12 +39,12 @@ public class FeedDBStorage implements FeedStorage {
                 .usingGeneratedKeyColumns("id");
 
         Number key = simpleJdbcInsert.executeAndReturnKey(event.eventToMap());
-        event.setEventId((long)key);
+        event.setEventId((long) key);
         log.debug("Event c ID {} создан.", event.getEventId());
         return event;
     }
 
-    private Event mapToEvent(ResultSet rs, int rowNum) throws SQLException{
+    private Event mapToEvent(ResultSet rs, int rowNum) throws SQLException {
         return Event.builder()
                 .eventId(rs.getLong("id"))
                 .userId(rs.getLong("userId"))

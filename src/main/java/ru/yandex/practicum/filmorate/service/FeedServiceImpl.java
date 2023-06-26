@@ -13,14 +13,16 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+
 @Service
 @Slf4j
 public class FeedServiceImpl implements FeedService {
 
     private final FeedStorage feedStorage;
     private final UserStorage us;
+
     @Autowired
-    public FeedServiceImpl(FeedStorage feedStorage,@Qualifier("userDBStorage") UserStorage us) {
+    public FeedServiceImpl(FeedStorage feedStorage, @Qualifier("userDBStorage") UserStorage us) {
         this.feedStorage = feedStorage;
         this.us = us;
     }
