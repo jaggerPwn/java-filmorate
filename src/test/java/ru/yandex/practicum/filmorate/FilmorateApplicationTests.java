@@ -634,7 +634,7 @@ class FilmorateApplicationTests {
         likeDBStorage.addLike(2L, 2L);
         List<Film> saveRecomendation = userServiceImpl.findRecommendation(2L);
         Assertions.assertEquals(1, saveRecomendation.size());
-        Assertions.assertEquals(3L, saveRecomendation.get(0));
+        Assertions.assertEquals(3L, saveRecomendation.get(0).getId());
     }
 
     @DisplayName("Тест создания и получения ревью по ID")
