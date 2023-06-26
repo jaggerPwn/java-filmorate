@@ -18,6 +18,14 @@ public interface FilmService {
 
     void userLike(Long idFilm, Long idUser);
 
-    List<FilmDTO> readTopFilms(Long count);
+    List<FilmDTO> getTopFilms(Long count, Long genreId, Long year);
+
+    List<FilmDTO> searchFilm(String query, String by);
+
+    void deleteFilm(Long id);
+
+    List<FilmDTO> getCommonFilms(Long userId, Long friendId);
+
+    List<FilmDTO> getSortedFilms(Long id, String sortBy);
 
 }

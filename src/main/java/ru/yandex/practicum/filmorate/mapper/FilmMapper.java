@@ -25,6 +25,7 @@ public class FilmMapper {
                 .duration(film.getDuration())
                 .likes(film.getLikes())
                 .genres(film.getGenres())
+                .directors(film.getDirectors())
                 .mpa(film.getMpa())
                 .build();
     }
@@ -42,6 +43,7 @@ public class FilmMapper {
                 .duration(filmDTO.getDuration())
                 .likes(filmDTO.getLikes())
                 .genres(filmDTO.getGenres())
+                .directors(filmDTO.getDirectors())
                 .mpa(filmDTO.getMpa())
                 .build();
     }
@@ -49,5 +51,4 @@ public class FilmMapper {
     public static List<FilmDTO> listFilmsToListDto(Collection<Film> films) {
         return films.stream().map(FilmMapper::filmToDTO).collect(Collectors.toList());
     }
-
 }

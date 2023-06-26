@@ -7,10 +7,16 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
+import ru.yandex.practicum.filmorate.storage.FilmDBStorage;
+import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,10 +28,17 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage us;
+    private final FeedService fs;
+    private final LikeDBStorage likeDBStorage;
+    private final FilmDBStorage filmDBStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us) {
+    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage,
+            FilmDBStorage filmDBStorage, FeedService fs) {
         this.us = us;
+        this.fs = fs;
+        this.likeDBStorage = likeDBStorage;
+        this.filmDBStorage = filmDBStorage;
     }
 
     @Override
@@ -57,6 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addFiend(Long userId, Long friendId) {
         us.userAddFriend(userId, friendId);
+        fs.saveFeed(userId, Instant.now().toEpochMilli(), EventType.FRIEND, Operation.ADD, friendId);
         log.debug("User c ID {} добавлен Friend (User) c ID {}.", userId, friendId);
     }
 
@@ -69,7 +83,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteFriendById(Long idUser, Long idFriend) {
         us.userDeleteFriend(idUser, idFriend);
-        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser,idFriend);
+        fs.saveFeed(idUser, Instant.now().toEpochMilli(), EventType.FRIEND, Operation.REMOVE, idFriend);
+        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser, idFriend);
     }
 
     @Override
@@ -80,7 +95,7 @@ public class UserServiceImpl implements UserService {
         for (Long id : ids) {
             friends.add(UserMapper.userToDTO(us.getUserById(id)));
         }
-        log.debug("Список друзей у User c ID {} был получен.", idUser);
+        log.debug("Получен список друзей у User c ID {}.", idUser);
         return friends;
     }
 
@@ -88,8 +103,30 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2) {
         Set<Long> ids = new HashSet<>(us.getUserById(idUser1).getFriends());
         ids.retainAll(us.getUserById(idUser2).getFriends());
-        log.debug("Возвращён список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
+        log.debug("Получен список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(us::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> findRecommendation(Long idUser) {
+        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
+        if (sameUserIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
+
+        List<Film> films = new ArrayList<>();
+        for (Long id : recommendations) {
+            films.add(filmDBStorage.getFilmById(id));
+        }
+        log.debug("Получен список Films рекоменованных для User с ID {}", idUser);
+        return films;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        us.deleteUser(id);
     }
 
 }

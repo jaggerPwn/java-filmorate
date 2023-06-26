@@ -51,11 +51,39 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.debug("Film с ID {} не получен", id);
             throw new EntityNotFoundException("Film с ID не найден");
         }
+    }
 
+    public List<Film> getSortedFilms(Long id, String sortBy) {
+        return null;
     }
 
     @Override
-    public Set<Film> getTopFilms(Long count) {
+    public List<Film> searchFilmForDirector(String queryStr) {
         return null;
+    }
+
+    @Override
+    public List<Film> searchFilmForTitle(String queryStr) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmForTitleAndDirector(String queryStr) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getTopFilms(Long count, Long genreId, Long year) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return null;
+    }
+
+
+    @Override
+    public void deleteFilm(Long id) {
     }
 }

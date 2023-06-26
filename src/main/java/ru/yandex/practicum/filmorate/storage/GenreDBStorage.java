@@ -55,8 +55,10 @@ public class GenreDBStorage implements GenreStorage {
     }
 
     public Set<Genre> getGenresByFilmID(Long filmId) {
-        String sqlQuery = "SELECT genreid, name FROM filmgenres INNER JOIN genres ON genreid = id WHERE filmid = ?";
-        List<Genre> genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> new Genre(rs.getInt("genreid"), rs.getString("name")), filmId);
+        String sqlQuery
+                = "SELECT genreid, name FROM filmgenres INNER JOIN genres ON genreid = id WHERE filmid = ? ORDER BY genreid ASC ";
+        List<Genre> genres = jdbcTemplate.query(sqlQuery,
+                (rs, rowNum) -> new Genre(rs.getInt("genreid"), rs.getString("name")), filmId);
         log.debug("Получен список Genres  для Film с id {}", filmId);
         return new HashSet<>(genres);
     }
