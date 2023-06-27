@@ -28,7 +28,9 @@
 3. Настроен ExceptionHandler для централизованной обработки ошибок
 </details>
 
-# * Спринт 11. Часть 1:
+<summary><h3> Спринт 11. </h3></summary>
+<details>
+Часть 1:
 1. Переработана архитектура проекта: добавлены дополнительные поля в классы Film (жанр и рейтинг) и User (список дружбы).
  
 2. Спроектирована схема БД:
@@ -179,3 +181,9 @@ mvn clean install
 ```bash
 mvn spring-boot:run
 ```
+</details>
+
+
+# * Спринт 12
+https://dbdiagram.io/d/64833537722eb77494b25d51
+![](images/FILMORATE_DBSPR12.png)
