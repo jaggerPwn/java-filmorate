@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final FeedService feedService;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage, FeedService feedService ) {
+    public UserServiceImpl(UserStorage userStorage, FeedService feedService) {
         this.userStorage = userStorage;
         this.feedService = feedService;
     }
