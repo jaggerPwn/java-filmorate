@@ -12,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class RecommendationServiceImpl implements RecommendationService{
+public class RecommendationServiceImpl implements RecommendationService {
 
     private final LikeService likeService;
     private final FilmService filmService;

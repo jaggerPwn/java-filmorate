@@ -41,7 +41,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public List<Long> getFilmRecommendationsFrom(Long userId, List<Long> sameUserIds) {
-        return likeStorage.getFilmRecommendationsFrom(userId,sameUserIds);
+        return likeStorage.getFilmRecommendationsFrom(userId, sameUserIds);
     }
 
 }

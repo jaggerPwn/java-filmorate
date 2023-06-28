@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class LikeDBStorage implements LikeStorage{
+public class LikeDBStorage implements LikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -72,7 +72,7 @@ public class LikeDBStorage implements LikeStorage{
         log.debug("Получен список с Films id для рекомендаций User с ID {}.", userId);
         return idFilmsOfRec;
     }
-    
+
     private static Long mapRow(ResultSet rs, int rowNum) throws SQLException {
         return rs.getLong("FILMID");
     }
