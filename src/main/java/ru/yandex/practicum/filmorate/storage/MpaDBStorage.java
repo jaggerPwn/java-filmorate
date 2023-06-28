@@ -27,7 +27,7 @@ public class MpaDBStorage implements MpaStorage {
     public Mpa readById(Integer id) {
         String sqlQuery = "SELECT * FROM mpa WHERE id = ?";
         if (id == null) {
-            throw new ValidationException("Невозможно выполнить запрос спустым аргументом.");
+            throw new ValidationException("Невозможно выполнить запрос с пустым аргументом.");
         }
         try {
             log.debug("Получен Mpa по id {}.", id);

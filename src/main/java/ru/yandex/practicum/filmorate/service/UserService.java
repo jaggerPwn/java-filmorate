@@ -22,5 +22,6 @@ public interface UserService {
 
     List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2);
 
+    void deleteUser(Long id);
 
 }

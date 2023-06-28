@@ -27,13 +27,13 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity<List<GenreDTO>> readAll() {
-        log.info("Получен GET запрос по эндпоинту '/genres' на получение всех жанров");
+        log.info("Получен GET запрос по эндпоинту '/genres' на получение всех Genres");
         return new ResponseEntity<>(genreService.readAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GenreDTO> readById(@PathVariable Integer id) {
-        log.info("Получен GET запрос по эндпоинту '/genres/{id}' на получение жанра по id");
+        log.info("Получен GET запрос по эндпоинту '/genres/{}' на получение Genre по id", id);
         return new ResponseEntity<>(genreService.readById(id), HttpStatus.OK);
     }
 

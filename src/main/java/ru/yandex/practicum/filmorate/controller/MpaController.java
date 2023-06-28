@@ -27,13 +27,13 @@ public class MpaController {
 
     @GetMapping
     public ResponseEntity<List<MpaDTO>> readAll() {
-        log.info("Получен GET запрос по эндпоинту '/mpa' на получение всех рейтингов");
+        log.info("Получен GET запрос по эндпоинту '/mpa' на получение всех mpa");
         return new ResponseEntity<>(mpaService.readAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MpaDTO> readById(@PathVariable Integer id) {
-        log.info("Получен GET запрос по эндпоинту '/mpa/{id}' на получение ретинга по id");
+        log.info("Получен GET запрос по эндпоинту '/mpa/{}' на получение mpa по id", id);
         return new ResponseEntity<>(mpaService.readById(id), HttpStatus.OK);
     }
 

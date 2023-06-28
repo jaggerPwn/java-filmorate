@@ -14,7 +14,7 @@ public class FilmMapper {
 
     public static FilmDTO filmToDTO(Film film) {
         if (film == null) {
-            return null;
+            throw new IllegalArgumentException("film cannot be null");
         }
 
         return FilmDTO.builder()
@@ -25,13 +25,14 @@ public class FilmMapper {
                 .duration(film.getDuration())
                 .likes(film.getLikes())
                 .genres(film.getGenres())
+                .directors(film.getDirectors())
                 .mpa(film.getMpa())
                 .build();
     }
 
     public static Film dtoToFilm(FilmDTO filmDTO) {
         if (filmDTO == null) {
-            return null;
+            throw new IllegalArgumentException("filmDTO cannot be null");
         }
 
         return Film.builder()
@@ -42,6 +43,7 @@ public class FilmMapper {
                 .duration(filmDTO.getDuration())
                 .likes(filmDTO.getLikes())
                 .genres(filmDTO.getGenres())
+                .directors(filmDTO.getDirectors())
                 .mpa(filmDTO.getMpa())
                 .build();
     }
@@ -49,5 +51,4 @@ public class FilmMapper {
     public static List<FilmDTO> listFilmsToListDto(Collection<Film> films) {
         return films.stream().map(FilmMapper::filmToDTO).collect(Collectors.toList());
     }
-
 }
