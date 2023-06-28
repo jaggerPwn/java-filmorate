@@ -11,7 +11,7 @@ public class ReviewMapper {
 
     public static ReviewDTO reviewToDTO(Review review) {
         if (review == null) {
-            return null;
+            throw new IllegalArgumentException("review cannot be null");
         }
 
         return ReviewDTO.builder()
@@ -26,7 +26,7 @@ public class ReviewMapper {
 
     public static Review dtoToReview(ReviewDTO reviewDTO) {
         if (reviewDTO == null) {
-            return null;
+            throw new IllegalArgumentException("reviewDTO cannot be null");
         }
 
         return Review.builder()

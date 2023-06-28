@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.EventDTO;
 import ru.yandex.practicum.filmorate.mapper.EventMapper;
@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -19,17 +18,17 @@ import java.util.List;
 public class FeedServiceImpl implements FeedService {
 
     private final FeedStorage feedStorage;
-    private final UserStorage us;
+    private final UserService userService;
 
     @Autowired
-    public FeedServiceImpl(FeedStorage feedStorage, @Qualifier("userDBStorage") UserStorage us) {
+    public FeedServiceImpl(FeedStorage feedStorage, @Lazy UserService userService) {
         this.feedStorage = feedStorage;
-        this.us = us;
+        this.userService = userService;
     }
 
     @Override
     public List<EventDTO> getFeed(long id) {
-        us.getUserById(id); // для валидации
+        userService.getUserById(id); // для валидации
         return EventMapper.listEventsToListDto(feedStorage.getFeed(id));
     }
 

@@ -11,7 +11,9 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -38,7 +40,7 @@ public class FeedDBStorage implements FeedStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("feed")
                 .usingGeneratedKeyColumns("id");
 
-        Number key = simpleJdbcInsert.executeAndReturnKey(event.eventToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(eventToMap(event));
         event.setEventId((long) key);
         log.debug("Event c ID {} создан.", event.getEventId());
         return event;
@@ -53,5 +55,15 @@ public class FeedDBStorage implements FeedStorage {
                 .operation(Operation.valueOf(rs.getString("operation")))
                 .entityId(rs.getLong("entityId"))
                 .build();
+    }
+
+    public Map<String, Object> eventToMap(Event event) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("userId", event.getUserId());
+        temp.put("timestamp", event.getTimestamp());
+        temp.put("eventType", event.getEventType().name());
+        temp.put("operation", event.getOperation().name());
+        temp.put("entityId", event.getEntityId());
+        return temp;
     }
 }

@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class LikeDBStorage {
+public class LikeDBStorage implements LikeStorage{
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -23,13 +23,14 @@ public class LikeDBStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-
+    @Override
     public void deleteLike(Long filmId, Long userId) {
         String query = "DELETE FROM likes WHERE filmid = ? AND userid = ?";
         jdbcTemplate.update(query, filmId, userId); // в том же порядке что и в скрипте
         log.debug("Like у Film с id {} от User с ID {} удалён", filmId, userId);
     }
 
+    @Override
     public void addLike(Long filmId, Long userId) {
         String query = "DELETE FROM likes WHERE filmId = ? AND userId = ? ";
         jdbcTemplate.update(query, filmId, userId);
@@ -38,7 +39,7 @@ public class LikeDBStorage {
         log.debug("Film с ID {} добавлен Like от User с ID {}", filmId, userId);
     }
 
-
+    @Override
     public Set<Long> getLikerByFilmId(Long filmID) {
         String query = "SELECT userid FROM likes WHERE filmid = ?";
         List<Long> likes = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("userid"), filmID);
@@ -46,6 +47,7 @@ public class LikeDBStorage {
         return new HashSet<>(likes);
     }
 
+    @Override
     public List<Long> getUsersWithSameLikes(Long userId) {
         final String sqlQuery = "SELECT fl.userid, count(fl.filmid) rate from likes ul" +
                 " join likes fl  on (ul.filmid = fl.filmid and ul.userid != fl.userid)" +
@@ -60,6 +62,7 @@ public class LikeDBStorage {
         return usersForLike;
     }
 
+    @Override
     public List<Long> getFilmRecommendationsFrom(Long userId, List<Long> sameUserIds) {
         String inSql = String.join(",", Collections.nCopies(sameUserIds.size(), "?"));
         final String sqlQuery = "select fl.filmid from likes fl " +
@@ -69,7 +72,7 @@ public class LikeDBStorage {
         log.debug("Получен список с Films id для рекомендаций User с ID {}.", userId);
         return idFilmsOfRec;
     }
-
+    
     private static Long mapRow(ResultSet rs, int rowNum) throws SQLException {
         return rs.getLong("FILMID");
     }

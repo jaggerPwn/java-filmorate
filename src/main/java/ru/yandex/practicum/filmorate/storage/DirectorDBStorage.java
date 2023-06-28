@@ -10,9 +10,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -24,7 +22,7 @@ public class DirectorDBStorage implements DirectorStorage {
     public Director saveDirector(Director director) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("directors")
                 .usingGeneratedKeyColumns("directorid");
-        Number key = simpleJdbcInsert.executeAndReturnKey(director.directorToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(directorToMap(director));
         director.setId((Long) key);
         log.debug("Director создан с ID {}.", director.getId());
         return director;
@@ -86,4 +84,11 @@ public class DirectorDBStorage implements DirectorStorage {
         log.debug("Получен список Directors для Film с id {}", filmId);
         return new HashSet<>(directors);
     }
+
+    public Map<String, Object> directorToMap(Director director) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("name", director.getName());
+        return temp;
+    }
+
 }

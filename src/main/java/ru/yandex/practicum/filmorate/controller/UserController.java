@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.EventDTO;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FeedService;
+import ru.yandex.practicum.filmorate.service.RecommendationService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -20,11 +21,13 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final FeedService feedService;
+    private final RecommendationService recommendationService;
 
     @Autowired
-    public UserController(UserService userService, FeedService feedService) {
+    public UserController(UserService userService, FeedService feedService, RecommendationService recommendationService) {
         this.userService = userService;
         this.feedService = feedService;
+        this.recommendationService = recommendationService;
     }
 
     @PostMapping
@@ -97,7 +100,7 @@ public class UserController {
     public ResponseEntity<List<Film>> findRecommendation(@PathVariable Long id) {
         log.info("Получен GET запрос по эндпоинту '{}/recommendations' на получение recommendations для User c ID {}.",
                 id, id);
-        return new ResponseEntity<>(userService.findRecommendation(id), HttpStatus.OK);
+        return new ResponseEntity<>(recommendationService.findRecommendation(id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/feed")

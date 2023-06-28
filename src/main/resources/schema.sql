@@ -79,7 +79,7 @@ create TABLE IF NOT EXISTS filmdirectors
 create TABLE IF NOT EXISTS REVIEWS
 (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR NOT NULL,
+    content VARCHAR(1000) NOT NULL,
     ispositive BOOLEAN,
     userid BIGINT NOT NULL REFERENCES users(id) ON delete RESTRICT,
     filmid BIGINT NOT NULL REFERENCES films(id) ON delete RESTRICT

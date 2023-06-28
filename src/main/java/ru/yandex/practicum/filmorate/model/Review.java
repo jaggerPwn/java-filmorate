@@ -6,8 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @Builder
@@ -23,14 +21,4 @@ public class Review {
     @NotNull
     private Long filmId;
     private int useful;
-
-    public Map<String, ?> reviewToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("id", reviewId);
-        temp.put("content", content);
-        temp.put("ispositive", isPositive);
-        temp.put("userid", userId);
-        temp.put("filmid", filmId);
-        return temp;
-    }
 }

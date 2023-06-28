@@ -30,25 +30,25 @@ public class DirectorController {
 
     @PostMapping
     public ResponseEntity<DirectorDTO> createDirector(@RequestBody @Valid DirectorDTO newDirector) {
-        log.info("Получен POST запрос по эндпоинту '/directors' на создание director");
+        log.info("Получен POST запрос по эндпоинту '/directors' на создание director {}.", newDirector.getName());
         return new ResponseEntity<>(directorService.saveDirector(newDirector), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<DirectorDTO> updateDirector(@RequestBody @Valid DirectorDTO director) {
-        log.info("Получен PUT запрос по эндпоинту '/directors' на обновление director");
+        log.info("Получен PUT запрос по эндпоинту '/directors' на обновление director c ID {}.", director.getId());
         return new ResponseEntity<>(directorService.updateDirector(director), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<DirectorDTO> getDirectorById(@PathVariable Long id) {
-        log.info("Получен GET запрос по эндпоинту '/directors/{}' на получение director по ID", id);
+        log.info("Получен GET запрос по эндпоинту '/directors/{}' на получение director по ID {}.", id, id);
         return new ResponseEntity<>(directorService.getDirectorById(id), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<DirectorDTO> deleteDirectorById(@PathVariable Long id) {
-        log.info("Получен DELETE запрос по эндпоинту '/directors/{}' на удаление director", id);
+        log.info("Получен DELETE запрос по эндпоинту '/directors/{}' на удаление directorпо ID {}.", id, id);
         directorService.deleteDirectorById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

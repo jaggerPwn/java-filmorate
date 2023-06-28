@@ -14,7 +14,7 @@ public class FilmMapper {
 
     public static FilmDTO filmToDTO(Film film) {
         if (film == null) {
-            return null;
+            throw new IllegalArgumentException("film cannot be null");
         }
 
         return FilmDTO.builder()
@@ -32,7 +32,7 @@ public class FilmMapper {
 
     public static Film dtoToFilm(FilmDTO filmDTO) {
         if (filmDTO == null) {
-            return null;
+            throw new IllegalArgumentException("filmDTO cannot be null");
         }
 
         return Film.builder()

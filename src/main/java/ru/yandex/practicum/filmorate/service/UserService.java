@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.dto.UserDTO;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 
@@ -25,5 +24,4 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    List<Film> findRecommendation(Long idUser);
 }

@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
-import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,21 +18,21 @@ import java.util.List;
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
-    private final ReviewStorage rs;
-    private final UserService us;
+    private final ReviewStorage reviewStorage;
+    private final UserService userService;
     private final FeedService feedService;
 
     @Autowired
-    public ReviewServiceImpl(ReviewStorage rs, UserService us, FeedService feedService) {
-        this.rs = rs;
-        this.us = us;
+    public ReviewServiceImpl(ReviewStorage reviewStorage, UserService userService, FeedService feedService) {
+        this.reviewStorage = reviewStorage;
+        this.userService = userService;
         this.feedService = feedService;
     }
 
 
     @Override
     public ReviewDTO addReview(ReviewDTO reviewDTO) {
-        Review review = rs.saveReview(ReviewMapper.dtoToReview(reviewDTO));
+        Review review = reviewStorage.saveReview(ReviewMapper.dtoToReview(reviewDTO));
         feedService.saveFeed(review.getUserId(),
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.ADD,
@@ -44,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO updateReview(ReviewDTO reviewDTO) {
-        Review review = rs.updateReview(ReviewMapper.dtoToReview(reviewDTO));
+        Review review = reviewStorage.updateReview(ReviewMapper.dtoToReview(reviewDTO));
         feedService.saveFeed(review.getUserId(),
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.UPDATE,
@@ -55,48 +54,46 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void deleteReviewById(Long reviewId) {
-        Review review = rs.getReviewById(reviewId);
+        Review review = reviewStorage.getReviewById(reviewId);
         feedService.saveFeed(review.getUserId(),
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.REMOVE,
                 reviewId);
         log.debug("получен запрос на удаление review c ID c {}", reviewId);
-        rs.deleteReviewById(reviewId);
+        reviewStorage.deleteReviewById(reviewId);
     }
 
     @Override
     public void addReviewLikeOrDislike(Long reviewId, Long userId, boolean positive) {
-        Review review = this.rs.getReviewById(reviewId);
-        UserDTO user = us.getUserById(userId);
-        Validator.validateForGrade(review, user);
+        Review review = this.reviewStorage.getReviewById(reviewId);
+        UserDTO user = userService.getUserById(userId);
         if (positive)
             log.debug("Получен запрос на добавление Like для review c Id {} от user c ID {}.", reviewId, userId);
         if (!positive)
             log.debug("Получен запрос на добавление disLike для review c Id {} от user c ID {}.", reviewId, userId);
-        rs.saveReviewLikesOrDislikes(reviewId, userId, positive);
+        reviewStorage.saveReviewLikesOrDislikes(reviewId, userId, positive);
     }
 
     @Override
     public void deleteReviewLikeOrDislike(Long reviewId, Long userId, boolean positive) {
-        Review review = this.rs.getReviewById(reviewId);
-        UserDTO user = us.getUserById(userId);
-        Validator.validateForGrade(review, user);
+        Review review = this.reviewStorage.getReviewById(reviewId);
+        UserDTO user = userService.getUserById(userId);
         if (positive)
             log.debug("Получен запрос на удаление Like для review c Id {} от user c ID {}.", reviewId, userId);
         if (!positive)
             log.debug("Получен запрос на удаление disLike для review c Id {} от user c ID {}.", reviewId, userId);
-        rs.deleteReviewLikesOrDislikes(reviewId, userId, positive);
+        reviewStorage.deleteReviewLikesOrDislikes(reviewId, userId, positive);
     }
 
     @Override
     public ReviewDTO getReviewById(long reviewId) {
         log.debug("получен запрос на обновление Review c ID c {}", reviewId);
-        return ReviewMapper.reviewToDTO(rs.getReviewById(reviewId));
+        return ReviewMapper.reviewToDTO(reviewStorage.getReviewById(reviewId));
     }
 
     @Override
     public List<ReviewDTO> getAllReviews(Long filmId, Long count) {
         log.debug("получен запрос на получение Review по Film ID c {}", filmId);
-        return ReviewMapper.listUsersToListDto(rs.readAllReviews(filmId, count));
+        return ReviewMapper.listUsersToListDto(reviewStorage.readAllReviews(filmId, count));
     }
 }

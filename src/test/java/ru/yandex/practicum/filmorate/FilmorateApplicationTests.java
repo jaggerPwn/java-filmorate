@@ -13,14 +13,11 @@ import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.ReviewService;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
@@ -38,11 +35,11 @@ class FilmorateApplicationTests {
     private final GenreDBStorage genreDBStorage;
     private final LikeDBStorage likeDBStorage;
     private final MpaDBStorage mpaDBStorage;
-    private final UserServiceImpl userServiceImpl;
     private final DirectorDBStorage directorDBStorage;
     private final FeedDBStorage feedDBStorage;
     private final UserService userService;
     private final FilmService filmService;
+    private final RecommendationService recommendationService;
 
 
     private final ReviewStorage reviewStorage;
@@ -632,7 +629,7 @@ class FilmorateApplicationTests {
         userDBStorage.saveUser(user2);
         likeDBStorage.addLike(1L, 2L);
         likeDBStorage.addLike(2L, 2L);
-        List<Film> saveRecomendation = userServiceImpl.findRecommendation(2L);
+        List<Film> saveRecomendation = recommendationService.findRecommendation(2L);
         Assertions.assertEquals(1, saveRecomendation.size());
         Assertions.assertEquals(3L, saveRecomendation.get(0).getId());
     }

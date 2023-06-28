@@ -15,9 +15,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component("userDBStorage")
@@ -34,7 +32,7 @@ public class UserDBStorage implements UserStorage {
     public User saveUser(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users")
                 .usingGeneratedKeyColumns("id");
-        Number key = simpleJdbcInsert.executeAndReturnKey(user.userToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(userToMap(user));
         user.setId((Long) key);
         log.debug("User создан с ID {}.", user.getId());
         return user;
@@ -161,4 +159,12 @@ public class UserDBStorage implements UserStorage {
         }
     }
 
+    public Map<String, Object> userToMap(User user) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("email", user.getEmail());
+        temp.put("login", user.getLogin());
+        temp.put("name", user.getName());
+        temp.put("birthday", user.getBirthday());
+        return temp;
+    }
 }

@@ -14,7 +14,7 @@ public class EventMapper {
 
     public static EventDTO eventToDTO(Event event) {
         if (event == null) {
-            return null;
+            throw new IllegalArgumentException("Event cannot be null");
         }
 
         return EventDTO.builder()
@@ -29,7 +29,7 @@ public class EventMapper {
 
     public static Event dtoToEvent(EventDTO eventDTO) {
         if (eventDTO == null) {
-            return null;
+            throw new IllegalArgumentException("EventDTO cannot be null");
         }
 
         return Event.builder()

@@ -16,7 +16,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component("filmDBStorage")
@@ -42,7 +44,7 @@ public class FilmDBStorage implements FilmStorage {
     public Film saveFilm(Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("films")
                 .usingGeneratedKeyColumns("id");
-        Number key = simpleJdbcInsert.executeAndReturnKey(film.filmToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(filmToMap(film));
         film.setId((Long) key);
         film.setMpa(mpaDBStorage.readById(film.getMpa().getId()));
 
@@ -273,6 +275,15 @@ public class FilmDBStorage implements FilmStorage {
         List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, count);
         log.debug("Получаем топ {} Film по кол-ву Likes.", count);
         return topFilms;
+    }
 
+    public Map<String, Object> filmToMap(Film film) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("name", film.getName());
+        temp.put("description", film.getDescription());
+        temp.put("releaseDate", film.getReleaseDate());
+        temp.put("duration", film.getDuration());
+        temp.put("mpaid", film.getMpa().getId());
+        return temp;
     }
 }

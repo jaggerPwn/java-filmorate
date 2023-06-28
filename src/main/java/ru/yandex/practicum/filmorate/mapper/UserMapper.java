@@ -14,7 +14,7 @@ public class UserMapper {
 
     public static UserDTO userToDTO(User user) {
         if (user == null) {
-            return null;
+            throw new IllegalArgumentException("user cannot be null");
         }
 
         return UserDTO.builder()
@@ -28,7 +28,7 @@ public class UserMapper {
 
     public static User dtoToUser(UserDTO userDTO) {
         if (userDTO == null) {
-            return null;
+            throw new IllegalArgumentException("userDTO cannot be null");
         }
 
         return User.builder()

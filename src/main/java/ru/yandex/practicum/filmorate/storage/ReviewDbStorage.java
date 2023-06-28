@@ -2,17 +2,20 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -20,26 +23,27 @@ import java.util.List;
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final FilmDBStorage fs;
-    private final UserDBStorage us;
+    private final FilmServiceImpl filmService;
+    private final UserServiceImpl userService;
 
 
     @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDBStorage") FilmDBStorage fs,
-                           @Qualifier("userDBStorage") UserDBStorage us) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate, FilmServiceImpl filmService, UserServiceImpl userService) {
         this.jdbcTemplate = jdbcTemplate;
-        this.fs = fs;
-        this.us = us;
+
+        this.filmService = filmService;
+        this.userService = userService;
     }
 
 
     @Override
     public Review saveReview(Review review) {
-        fs.getFilmById(review.getFilmId());
-        us.getUserById(review.getUserId());
+        filmService.getFilmByID(review.getFilmId());
+        userService.getUserById(review.getUserId());
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("reviews")
                 .usingGeneratedKeyColumns("id");
-        Number key = simpleJdbcInsert.executeAndReturnKey(review.reviewToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(reviewToMap(review.getContent(),
+                review.getIsPositive(), review.getUserId(), review.getFilmId()));
         review.setReviewId((Long) key);
         log.debug("Review на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
         return review;
@@ -97,11 +101,9 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void saveReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
-        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ? AND USERID = ? ";
-        jdbcTemplate.update(sql, reviewId, userId);
-        sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?) ";
+        String sql = "MERGE INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?) ";
         jdbcTemplate.update(sql, reviewId, userId, positive);
-        log.debug("Реакция на Review c ID {} от User c ID {} сохранены", reviewId, userId);
+        log.debug("Реакция на отзывы c ID {} от User c ID {} сохранены", reviewId, userId);
     }
 
     @Override
@@ -133,19 +135,33 @@ public class ReviewDbStorage implements ReviewStorage {
         log.debug("Review c ID {} удалён", id);
     }
 
-    public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
-        Review build = Review.builder()
-                .reviewId(resultSet.getLong("id"))
-                .content(resultSet.getString("content"))
-                .filmId(resultSet.getLong("filmId"))
-                .userId(resultSet.getLong("userId"))
-                .isPositive(resultSet.getBoolean("isPositive"))
-                .build();
+    public static Review mapToReview(ResultSet resultSet, int i) {
+        Review build = null;
         try {
-            build.setUseful(resultSet.getInt("useful"));
+            build = Review.builder()
+                    .reviewId(resultSet.getLong("id"))
+                    .content(resultSet.getString("content"))
+                    .filmId(resultSet.getLong("filmId"))
+                    .userId(resultSet.getLong("userId"))
+                    .isPositive(resultSet.getBoolean("isPositive"))
+                    .build();
         } catch (SQLException ignored) {
         }
+        try {
+            build.setUseful(resultSet.getInt("useful"));
+        } catch (SQLException sqlException) {
+            build.setUseful(0);
+        }
         return build;
-
     }
+
+    public Map<String, ?> reviewToMap(String content, boolean isPositive, long userId, long filmId) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("content", content);
+        temp.put("ispositive", isPositive);
+        temp.put("userid", userId);
+        temp.put("filmid", filmId);
+        return temp;
+    }
+
 }

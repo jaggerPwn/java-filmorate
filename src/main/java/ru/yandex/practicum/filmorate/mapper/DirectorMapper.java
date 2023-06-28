@@ -13,7 +13,7 @@ public class DirectorMapper {
 
     public static Director dtoToDirector(DirectorDTO directorDTO) {
         if (directorDTO == null) {
-            return null;
+            throw new IllegalArgumentException("directorDTO cannot be null");
         }
 
         return Director.builder()
@@ -24,7 +24,7 @@ public class DirectorMapper {
 
     public static DirectorDTO directorToDTO(Director director) {
         if (director == null) {
-            return null;
+            throw new IllegalArgumentException("director cannot be null");
         }
 
         return DirectorDTO.builder()
